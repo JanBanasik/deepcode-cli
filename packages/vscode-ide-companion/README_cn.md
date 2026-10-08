@@ -1,6 +1,8 @@
-# Deep Code
+# JCode
 
-[Deep Code](https://marketplace.visualstudio.com/items?itemName=vegamo.deepcode-vscode) 是 Visual Studio Code 的 AI 编码助手扩展，专门为最新的 `deepseek-v4` 模型优化。
+The JCode VSCode companion in this checkout is a personal fork of the [upstream Deep Code extension](https://marketplace.visualstudio.com/items?itemName=vegamo.deepcode-vscode), optimized for DeepSeek. This fork is not published to the Marketplace; the link identifies the upstream extension.
+
+Internal workspace packages, VSCode command IDs, and the `deepcode-self-refer` skill identifier retain their upstream names to preserve imports and existing settings.
 
 ## 配置
 
@@ -21,7 +23,7 @@
 ## 主要功能
 
 ### **Skills**
-Deep Code 支持 agent skills，允许您扩展助手的能力：
+JCode 支持 agent skills，允许您扩展助手的能力：
 
 - **User-level Skills**：从 `~/.agents/skills/` 目录中发现并激活 skills。
 - **Project-level Skills**：从 `./.agents/skills/` 目录中加载项目专属 skills，并兼容旧的 `./.deepcode/skills/` 目录。
@@ -41,33 +43,44 @@ Deep Code 支持 agent skills，允许您扩展助手的能力：
 
 ## 截图示例
 
-![screenshot](resources/deepcode_screenshot.png)
+Upstream companion reference, before JCode branding:
 
-## Deep Code CLI
+![Upstream companion](resources/deepcode_screenshot.png)
+
+## JCode CLI
 
 ```bash
-npm install -g @vegamo/deepcode-cli
+git clone https://github.com/JanBanasik/deepcode-cli.git JCode
+cd JCode
+npm ci
+npm run check
+npm test
+npm run build
+npm install --global --prefix "$HOME/.local/share/jcode" ./packages/cli --ignore-scripts
+export PATH="$HOME/.local/share/jcode/bin:$PATH"
+jcode --version
+jcode --help
 ```
 
-![intro1](https://raw.githubusercontent.com/lessweb/deepcode-cli/main/resources/intro1.png)
+![JCode CLI](https://raw.githubusercontent.com/JanBanasik/deepcode-cli/main/resources/jcode-120.png)
 
 > VSCode插件和CLI共享配置文件和数据，但运行时没有依赖。
 
-- GitHub： https://github.com/lessweb/deepcode-cli
+- GitHub: https://github.com/JanBanasik/deepcode-cli
 
 ## 常见问题
 
-### 如何将 Deep Code 从左侧边栏移动到右侧边栏（Secondary Side Bar）？
+### 如何将 JCode 从左侧边栏移动到右侧边栏（Secondary Side Bar）？
 
 ![faq1](resources/faq1.gif)
 
-### Deep Code是否支持理解图片？
+### JCode是否支持理解图片？
 
 支持。`deepseek-flash`模型支持直接读取本地图片或使用`ctrl+v`从剪贴板粘贴图片，让模型直接看到图片内容。
 
-`deepseek-v4-pro`、`deepseek-v4-flash`等非多模态模型仍会使用`UnderstandImage`识图工具。Deep Code会自动判断模型能力，也可通过`multimodal`配置项手动覆盖。
+`deepseek-v4-pro`、`deepseek-v4-flash`等非多模态模型仍会使用`UnderstandImage`识图工具。JCode会自动判断模型能力，也可通过`multimodal`配置项手动覆盖。
 
-默认情况下，图片会以base64内联发送给模型。启用`filesApiEnabled`后，Deep Code会使用DeepSeek Files API上传图片并在请求中复用`file_id`。详见 [docs/configuration.md](../../docs/configuration.md#deepseek-files-api)。
+默认情况下，图片会以base64内联发送给模型。启用`filesApiEnabled`后，JCode会使用DeepSeek Files API上传图片并在请求中复用`file_id`。详见 [docs/configuration.md](../../docs/configuration.md#deepseek-files-api)。
 
 ### 怎样在任务完成后自动给Slack发消息？
 
@@ -89,7 +102,7 @@ npm install -g @vegamo/deepcode-cli
 ```
 
 ## 获取帮助
-- 在 GitHub Issues 上报告错误或请求功能 (https://github.com/lessweb/deepcode-cli/issues)
+- 在 GitHub Issues 上报告错误或请求功能 (https://github.com/JanBanasik/deepcode-cli/issues)
 
 ## 支持我们
 

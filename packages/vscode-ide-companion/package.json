@@ -2,15 +2,15 @@
   "name": "deepcode-vscode",
   "version": "0.4.3",
   "publisher": "vegamo",
-  "displayName": "Deep Code",
-  "description": "Deep Code VSCode companion — AI-assisted development in your editor",
+  "displayName": "JCode",
+  "description": "JCode VSCode companion — AI-assisted development in your editor",
   "license": "MIT",
   "type": "commonjs",
   "main": "./out/extension.js",
   "preview": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/lessweb/deepcode-cli.git",
+    "url": "https://github.com/JanBanasik/deepcode-cli.git",
     "directory": "packages/vscode-ide-companion"
   },
   "engines": {
@@ -21,9 +21,7 @@
     "Chat"
   ],
   "keywords": [
-    "deep-code",
-    "deep code",
-    "deep",
+    "jcode",
     "code",
     "cli",
     "ide integration",
@@ -44,7 +42,7 @@
     "commands": [
       {
         "command": "deepcode.openView",
-        "title": "Open Deep Code",
+        "title": "Open JCode",
         "icon": {
           "light": "resources/deepcoding_icon.svg",
           "dark": "resources/deepcoding_icon.svg"
@@ -55,7 +53,7 @@
       "activitybar": [
         {
           "id": "deepcode",
-          "title": "Deep Code",
+          "title": "JCode",
           "icon": "resources/deepcoding_icon.png"
         }
       ]
@@ -64,7 +62,7 @@
       "deepcode": [
         {
           "id": "deepcode.chatView",
-          "name": "Deep Code",
+          "name": "JCode",
           "icon": "resources/deepcoding_icon.png",
           "type": "webview"
         }

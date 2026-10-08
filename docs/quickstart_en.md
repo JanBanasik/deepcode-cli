@@ -1,6 +1,6 @@
 # Quickstart
 
-Deep Code is an open-source terminal AI coding assistant for the DeepSeek-V4 model, supporting deep thinking, reasoning effort control, and extend its capabilities with Skills and MCP.
+JCode is an open-source terminal AI coding assistant for the DeepSeek-V4 model, supporting deep thinking, reasoning effort control, and extend its capabilities with Skills and MCP.
 
 ## Prerequisites
 
@@ -11,21 +11,32 @@ Before you start, make sure you have:
 
 ## Install
 
-Install Deep Code globally with npm:
+Build JCode from source and install it with a separate prefix (this fork is not published to npm):
 
 ```bash
-npm install -g @vegamo/deepcode-cli
+git clone https://github.com/JanBanasik/deepcode-cli.git JCode
+cd JCode
+npm ci
+npm run check
+npm test
+npm run build
+npm install --global --prefix "$HOME/.local/share/jcode" ./packages/cli --ignore-scripts
+export PATH="$HOME/.local/share/jcode/bin:$PATH"
+jcode --version
+jcode --help
 ```
 
 Check the installed version:
 
 ```bash
-deepcode --version
+jcode --version
 ```
+
+Internal workspace packages, VSCode command IDs, and the `deepcode-self-refer` skill identifier retain their upstream names to preserve imports and existing settings.
 
 ## Configure DeepSeek-V4
 
-Deep Code recommends `deepseek-v4-pro` and also supports `deepseek-v4-flash`. Create `~/.deepcode/settings.json` and add your DeepSeek model configuration:
+JCode recommends `deepseek-v4-pro` and also supports `deepseek-v4-flash`. Create `~/.deepcode/settings.json` and add your DeepSeek model configuration:
 
 ```json
 {
@@ -53,7 +64,7 @@ Common fields:
 
 You can also create `.deepcode/settings.json` inside a project to customize the model, permissions, or MCP settings for that project only.
 
-For DeepSeek's official setup notes, see the [Deep Code integration guide](https://api-docs.deepseek.com/zh-cn/quick_start/agent_integrations/deepcode).
+For DeepSeek's official setup notes, see the [upstream Deep Code integration guide](https://api-docs.deepseek.com/zh-cn/quick_start/agent_integrations/deepcode).
 
 For all configuration options, see [configuration_en.md](configuration_en.md).
 
@@ -63,15 +74,15 @@ Open your project directory:
 
 ```bash
 cd path/to/your/project
-deepcode
+jcode
 ```
 
-Deep Code starts an interactive terminal UI in the current directory. Type a task and press `Enter`.
+JCode starts an interactive terminal UI in the current directory. Type a task and press `Enter`.
 
 To start with an initial prompt:
 
 ```bash
-deepcode -p "Summarize this project"
+jcode -p "Summarize this project"
 ```
 
 ## Try These First
@@ -128,7 +139,7 @@ Type `/` in the input box to open the command menu.
 | `/mcp` | Show MCP server status and available tools |
 | `/undo` | Restore code and/or conversation to an earlier point |
 | `/raw` | Change the display mode |
-| `/exit` | Quit Deep Code |
+| `/exit` | Quit JCode |
 
 ## Add Project Instructions
 
@@ -138,14 +149,14 @@ Run this inside a project:
 /init
 ```
 
-Deep Code helps create `AGENTS.md`. Use it to record project conventions, such as:
+JCode helps create `AGENTS.md`. Use it to record project conventions, such as:
 
 - How to install dependencies and run tests
 - Code style and contribution expectations
 - Important directory notes
 - Checks to run before or after editing code
 
-Deep Code automatically uses these instructions when working in the project.
+JCode automatically uses these instructions when working in the project.
 
 ## Use Skills
 
@@ -163,7 +174,7 @@ For more details, see [agent-skills_en.md](agent-skills_en.md).
 
 ## Connect External Tools
 
-Use MCP to connect Deep Code to GitHub, browsers, databases, or other services.
+Use MCP to connect JCode to GitHub, browsers, databases, or other services.
 
 After configuring MCP, run:
 
@@ -177,15 +188,15 @@ For setup instructions, see [mcp_en.md](mcp_en.md).
 
 ## Permissions and Safety
 
-Deep Code may read files, edit code, or run commands. You can configure which actions are allowed automatically, which require confirmation, and which are denied.
+JCode may read files, edit code, or run commands. You can configure which actions are allowed automatically, which require confirmation, and which are denied.
 
-Deep Code supports YOLO mode by default, so it can smoothly read and write files, run commands, and continue common coding tasks. If you prefer a more cautious setup, use strict permissions so Deep Code asks before higher-risk actions.
+JCode supports YOLO mode by default, so it can smoothly read and write files, run commands, and continue common coding tasks. If you prefer a more cautious setup, use strict permissions so JCode asks before higher-risk actions.
 
 For details, see [permission_en.md](permission_en.md).
 
 ## Task Completion Notifications
 
-Deep Code can run a notification script when a task finishes, such as sending a Slack message, Feishu message, system notification, or terminal alert.
+JCode can run a notification script when a task finishes, such as sending a Slack message, Feishu message, system notification, or terminal alert.
 
 For examples, see [notify_en.md](notify_en.md).
 

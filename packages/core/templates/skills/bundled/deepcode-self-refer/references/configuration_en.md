@@ -1,65 +1,68 @@
-# Deep Code Configuration
+# JCode Configuration
 
 ## Configuration Hierarchy
 
 Configuration is applied in the following priority order (lower-numbered sources are overridden by higher-numbered ones):
 
-| Layer | Configuration Source  | Description                               |
-| ----- | --------------------- | ----------------------------------------- |
-| 1     | Defaults              | Hardcoded defaults within the application |
-| 2     | User settings file    | Global settings for the current user      |
-| 3     | Project settings file | Project-specific settings                 |
-| 4     | Environment variables | System-wide or session-specific variables |
+| Layer | Configuration Source | Description                                    |
+| ----- | -------------------- | ---------------------------------------------- |
+| 1     | Defaults             | Hardcoded defaults within the application      |
+| 2     | User settings file   | Global settings for the current user           |
+| 3     | Project settings file| Project-specific settings                      |
+| 4     | Environment variables| System-wide or session-specific variables      |
 
 ## Settings File
 
-Deep Code uses the `settings.json` file for persistent configuration, supporting two storage locations:
+JCode uses the `settings.json` file for persistent configuration, supporting two storage locations:
 
-| File Type             | Location                                 | Scope                                                                                                       |
-| --------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| User settings file    | `~/.deepcode/settings.json`              | Applies to all Deep Code sessions for the current user.                                                     |
-| Project settings file | `<project root>/.deepcode/settings.json` | Takes effect only when running Deep Code in that specific project. Project settings override user settings. |
+| File Type           | Location                                  | Scope                                                                 |
+| ------------------- | ----------------------------------------- | --------------------------------------------------------------------- |
+| User settings file  | `~/.deepcode/settings.json`               | Applies to all JCode sessions for the current user.               |
+| Project settings file | `<project root>/.deepcode/settings.json` | Takes effect only when running JCode in that specific project. Project settings override user settings. |
 
 ### Available Settings in `settings.json`
 
 The following are all the top-level fields supported in `settings.json`, along with the sub-fields inside `env`:
 
-| Field                      | Type          | Description                                                                                                    |
-| -------------------------- | ------------- | -------------------------------------------------------------------------------------------------------------- |
-| `env`                      | object        | Group of environment variables (see sub-field table below)                                                     |
-| `contextWindow`            | number/string | Context-window limit as an exact token count or `128K`/`1M` value                                              |
-| `autoCompactWindow`        | number/string | Auto-compaction threshold; defaults to 50% of the final context window                                         |
-| `model`                    | string        | Model name. Defaults to `deepseek-v4-flash` and takes precedence over `env.MODEL`                              |
-| `thinkingEnabled`          | boolean       | Whether to enable thinking mode (enabled by default for DeepSeek V4 series)                                    |
-| `reasoningEffort`          | string        | Reasoning intensity: `"low"`, `"high"`, or `"max"` (default `"max"`)                                           |
-| `filesApiEnabled`          | boolean       | Send images through the DeepSeek Files API (default `false`)                                                   |
-| `filesApiTimeoutMs`        | number        | Per-image Files API timeout; defaults to `60000`, maximum `600000` ms                                          |
-| `fileExpiresAfterSeconds`  | number        | Remote file lifetime, default `604800` seconds                                                                 |
-| `fileRefreshMarginSeconds` | number        | Refresh cached IDs below this remaining lifetime, default `3600` seconds                                       |
-| `fileQuotaCleanupBatch`    | number        | Oldest Deep Code files removed during quota recovery, default `100`                                            |
-| `maxRequestFilesBytes`     | number        | Raw image byte limit per request, default `134217728` (128 MiB)                                                |
-| `debugLogEnabled`          | boolean       | Enable debug log output (default `false`)                                                                      |
-| `telemetryEnabled`         | boolean       | Enable anonymous usage reporting (default `true`)                                                              |
-| `notify`                   | string        | Full path to a task-completion notification script (e.g., Slack notification script)                           |
-| `webSearchTool`            | string        | Full path to a custom web search script                                                                        |
-| `mcpServers`               | object        | MCP server configurations (keys are service names, values are McpServerConfig objects)                         |
-| `temperature`              | number        | Sampling temperature for LLM, from `0` to `2`                                                                  |
-| `permissions`              | object        | Permission policy and additional `addWorkingDirs` workspace roots (see [permission_en.md](./permission_en.md)) |
-| `enabledSkills`            | object        | Per-skill enable/disable map, keyed by skill name                                                              |
+| Field              | Type    | Description                                                                 |
+| ------------------ | ------- | --------------------------------------------------------------------------- |
+| `env`              | object  | Group of environment variables (see sub-field table below)                 |
+| `contextWindow`   | number/string | Context-window limit as an exact token count or `128K`/`1M` value   |
+| `autoCompactWindow` | number/string | Auto-compaction threshold; defaults to 50% of the final context window |
+| `model`            | string  | Model name. Takes precedence over `env.MODEL`                              |
+| `thinkingEnabled`  | boolean | Whether to enable thinking mode (enabled by default for DeepSeek V4 series)|
+| `reasoningEffort`  | string  | Reasoning intensity: `"low"`, `"high"`, or `"max"` (default `"max"`)    |
+| `multimodal`       | string  | Multimodal (image) capability override: `"default"`, `"on"`, or `"off"` (default `"default"`) |
+| `filesApiEnabled`  | boolean | Send images through the DeepSeek Files API (default `false`)               |
+| `filesApiTimeoutMs` | number | Per-image Files API timeout; defaults to `60000`, maximum `600000` ms       |
+| `fileExpiresAfterSeconds` | number | Remote file lifetime, default `604800` seconds                       |
+| `fileRefreshMarginSeconds` | number | Refresh cached IDs below this remaining lifetime, default `3600` seconds |
+| `fileQuotaCleanupBatch` | number | Oldest JCode files removed during quota recovery, default `100`    |
+| `maxRequestFilesBytes` | number | Raw image byte limit per request, default `134217728` (128 MiB)          |
+| `debugLogEnabled`  | boolean | Enable debug log output (default `false`)                                   |
+| `telemetryEnabled` | boolean | Enable anonymous usage reporting (default `true`)                           |
+| `notify`           | string  | Full path to a task-completion notification script (e.g., Slack notification script) |
+| `webSearchTool`    | string  | Full path to a custom web search script                                     |
+| `mcpServers`       | object  | MCP server configurations (keys are service names, values are McpServerConfig objects) |
+| `temperature`      | number  | Sampling temperature for LLM, from `0` to `2`                 |
+| `permissions`      | object  | Permission policy and additional `addWorkingDirs` workspace roots (see [permission_en.md](./permission_en.md)) |
+| `enabledSkills`    | object  | Per-skill enable/disable map, keyed by skill name                           |
+| `statusline`       | object  | Status line plugins (see [statusline_en.md](./statusline_en.md))            |
 
 #### `env` Sub-fields
 
-| Field               | Type   | Description                                                    |
-| ------------------- | ------ | -------------------------------------------------------------- |
-| `MODEL`             | string | Model name, e.g. `"deepseek-v4-pro"`, `"deepseek-v4-flash"`    |
-| `BASE_URL`          | string | Base URL for API requests, e.g. `"https://api.deepseek.com"`   |
-| `API_KEY`           | string | API key                                                        |
-| `TEMPERATURE`       | string | Sampling temperature for chat completions, from `"0"` to `"2"` |
-| `THINKING_ENABLED`  | string | Enable thinking mode                                           |
-| `REASONING_EFFORT`  | string | Reasoning intensity                                            |
-| `DEBUG_LOG_ENABLED` | string | Enable debug log output                                        |
-| `TELEMETRY_ENABLED` | string | Enable anonymous usage reporting                               |
-| `<any other KEY>`   | string | Custom environment variable                                    |
+| Field             | Type   | Description                                                      |
+| ----------------- | ------ | ---------------------------------------------------------------- |
+| `MODEL`           | string | Model name, e.g. `"deepseek-v4-pro"`, `"deepseek-v4-flash"`     |
+| `BASE_URL`        | string | Base URL for API requests, e.g. `"https://api.deepseek.com"`    |
+| `API_KEY`         | string | API key                                                         |
+| `TEMPERATURE`     | string | Sampling temperature for chat completions, from `"0"` to `"2"`  |
+| `THINKING_ENABLED`| string | Enable thinking mode                                            |
+| `REASONING_EFFORT`| string | Reasoning intensity                                             |
+| `MULTIMODAL`      | string | Multimodal (image) capability override: `"default"`, `"on"`, or `"off"` |
+| `DEBUG_LOG_ENABLED`| string| Enable debug log output                                         |
+| `TELEMETRY_ENABLED`| string| Enable anonymous usage reporting                                |
+| `<any other KEY>` | string | Custom environment variable                                     |
 
 #### Context Windows
 
@@ -78,18 +81,30 @@ The default context window is `256K` for regular models and `1M` for DeepSeek V4
 
 Whether to enable DeepSeek thinking mode. Set to `true` to enable, `false` to disable.
 
-- For `deepseek-v4-pro` and `deepseek-v4-flash`, thinking mode is **enabled by default**.
+- For `deepseek-flash`, `deepseek-v4-pro`, `deepseek-v4-flash`, and `deepseek-v4-flash-vision-exp`, thinking mode is **enabled by default**.
 - For other models, thinking mode is **disabled by default**.
 
 #### `reasoningEffort` — Reasoning Intensity
 
 When thinking mode is enabled, controls the depth of the model’s reasoning:
 
-| Value  | Description                                              |
-| ------ | -------------------------------------------------------- |
-| `max`  | Maximum reasoning depth (default)                        |
-| `high` | Higher reasoning depth with relatively lower token usage |
-| `low`  | Lower reasoning depth with lower token usage             |
+| Value  | Description                                               |
+| ------ | --------------------------------------------------------- |
+| `max`  | Maximum reasoning depth (default)                         |
+| `high` | Higher reasoning depth with relatively lower token usage  |
+| `low`  | Lower reasoning depth with lower token usage              |
+
+#### `multimodal` — Multimodal (Image) Capability
+
+Controls whether the current model is treated as a multimodal model that accepts image input:
+
+| Value     | Description                                                                 |
+| --------- | --------------------------------------------------------------------------- |
+| `default` | Inferred from the built-in known-model list (default)                       |
+| `on`      | Always treat the model as multimodal, images are sent inline as `image_url` |
+| `off`     | Always treat the model as non-multimodal, images are read on demand via UnderstandImage tool |
+
+Use this to override the default detection when your model is not in the known-model list, or when its actual capability differs from the default.
 
 #### DeepSeek Files API
 
@@ -106,7 +121,7 @@ When `BASE_URL` is `https://api.deepseek.com`, enabling `filesApiEnabled` upload
 }
 ```
 
-Each file is limited to 64 MiB, and the upload timeout cannot exceed 10 minutes. Remote IDs are cached in `~/.deepcode/files-api-cache.json` without storing the plaintext API key. During quota recovery, only the oldest files whose names start with `deepcode-` are removed before one retry.
+Each file is limited to 64 MiB, and the upload timeout cannot exceed DeepSeek's 10-minute limit. Remote IDs are cached in `~/.deepcode/files-api-cache.json` without storing the plaintext API key. On a remote storage-quota error, only the oldest files whose names start with `deepcode-` are removed before one retry.
 
 #### `notify` — Task Completion Notification
 
@@ -114,13 +129,13 @@ Set a full path to a shell script. When the AI assistant finishes a round of tas
 
 The following context is injected as environment variables when the notify script runs:
 
-| Variable      | Description                                     |
-| ------------- | ----------------------------------------------- |
-| `DURATION`    | Session duration in seconds (integer)           |
-| `STATUS`      | Session status: `"completed"` or `"failed"`     |
-| `FAIL_REASON` | Failure reason (only set on failure)            |
-| `BODY`        | The text content of the last AI assistant reply |
-| `TITLE`       | Session title (matches the resume list title)   |
+| Variable | Description |
+|----------|-------------|
+| `DURATION` | Session duration in seconds (integer) |
+| `STATUS` | Session status: `"completed"` or `"failed"` |
+| `FAIL_REASON` | Failure reason (only set on failure) |
+| `BODY` | The text content of the last AI assistant reply |
+| `TITLE` | Session title (matches the resume list title) |
 
 ```json
 {
@@ -132,7 +147,7 @@ The following context is injected as environment variables when the notify scrip
 
 #### `webSearchTool` — Custom Web Search
 
-Deep Code has a built-in, free-to-use Web Search tool. If you need custom search logic, set `webSearchTool` to the full path of an executable script:
+JCode has a built-in, free-to-use Web Search tool. If you need custom search logic, set `webSearchTool` to the full path of an executable script:
 
 ```json
 {
@@ -177,13 +192,13 @@ Configuration for MCP (Model Context Protocol) servers. The value is a key-value
 }
 ```
 
-| McpServerConfig field | Type     | Required | Description                                               |
-| --------------------- | -------- | -------- | --------------------------------------------------------- |
-| `command`             | string   | Yes      | Executable path or command (e.g. `npx`, `node`, `python`) |
-| `args`                | string[] | No       | List of arguments passed to the command                   |
-| `env`                 | object   | No       | Environment variables passed to the MCP server process    |
+| McpServerConfig field | Type     | Required | Description                                                              |
+| --------------------- | -------- | -------- | ------------------------------------------------------------------------ |
+| `command`             | string   | Yes      | Executable path or command (e.g. `npx`, `node`, `python`)                |
+| `args`                | string[] | No       | List of arguments passed to the command                                  |
+| `env`                 | object   | No       | Environment variables passed to the MCP server process                   |
 
-> When `command` is `npx`, Deep Code automatically prepends `-y` to the arguments.
+> When `command` is `npx`, JCode automatically prepends `-y` to the arguments.
 
 For detailed MCP usage instructions, refer to [mcp.md](mcp.md).
 
@@ -198,7 +213,7 @@ Set to `false` to disable anonymous usage reporting (default `true`). The report
 You can also disable it via environment variable:
 
 ```bash
-DEEPCODE_TELEMETRY_ENABLED=0 deepcode
+DEEPCODE_TELEMETRY_ENABLED=0 jcode
 ```
 
 ## Environment Variable Priority
@@ -210,7 +225,6 @@ Environment variables are a common way to configure applications, especially for
 Environment variable priority follows the logic of “the more specific and localized the configuration, the higher the priority”, and the override rule of “env files protect existing environment by default, system variables override env files”. (The `env` object in settings.json can be thought of as a type of env file.)
 
 Priority levels (from lowest to highest):
-
 1. `env` defined at the top level of `settings.json` – this is a general configuration for the entire tool and all its subprocesses (global variables). Can be overridden by outer environment variables, but the environment variable KEY has the `DEEPCODE_` prefix removed.
 2. `env` defined inside `mcpServers` in `settings.json` – this is the most specific configuration for a particular MCP service (local variables). Can be overridden by outer environment variables, but the KEY has the `MCP_` prefix removed.
 3. Shell/system environment variables – operating system level.
@@ -224,7 +238,7 @@ Applied in the following priority order (lower-numbered sources are overridden b
 1. Hardcoded default: `""`
 2. User-level settings.json: `{"env": {"API_KEY": "abc123"}}`
 3. Project-level settings.json: `{"env": {"API_KEY": "abc123"}}`
-4. System environment variable: `DEEPCODE_API_KEY=abc123 deepcode`
+4. System environment variable: `DEEPCODE_API_KEY=abc123 jcode`
 
 #### 2. Setting model, thinkingEnabled, and reasoningEffort
 
@@ -235,7 +249,7 @@ Applied in the following priority order (lower-numbered overridden by higher-num
 3. User-level settings.json: `{"thinkingEnabled": true}`
 4. Project-level settings.json: `{"env": {"THINKING_ENABLED": "true"}}`
 5. Project-level settings.json: `{"thinkingEnabled": true}`
-6. System environment variable: `DEEPCODE_THINKING_ENABLED=true deepcode`
+6. System environment variable: `DEEPCODE_THINKING_ENABLED=true jcode`
 
 #### 3. Setting environment variables for external scripts like notify and webSearchTool
 
@@ -244,7 +258,7 @@ Applied in the following priority order (lower-numbered overridden by higher-num
 1. Hardcoded default: `os.environ.get('WEBHOOK', '...')  # notify script code`
 2. User-level settings.json: `{"env": {"WEBHOOK": "..."}}`
 3. Project-level settings.json: `{"env": {"WEBHOOK": "true"}}`
-4. System environment variable: `DEEPCODE_WEBHOOK=... deepcode`
+4. System environment variable: `DEEPCODE_WEBHOOK=... jcode`
 
 #### 4. Setting environment variables for an MCP Service
 
@@ -254,7 +268,7 @@ Applied in the following priority order (lower-numbered overridden by higher-num
 2. User-level settings.json: `{"env": {"MCP_GITHUB_PERSONAL_ACCESS_TOKEN": "..."}}`
 3. Project-level settings.json: `{"mcpServers":{"github":{"env":{"GITHUB_PERSONAL_ACCESS_TOKEN":"..."}}}}`
 4. Project-level settings.json: `{"env": {"MCP_GITHUB_PERSONAL_ACCESS_TOKEN": "..."}}`
-5. System environment variable: `DEEPCODE_MCP_GITHUB_PERSONAL_ACCESS_TOKEN=... deepcode`
+5. System environment variable: `DEEPCODE_MCP_GITHUB_PERSONAL_ACCESS_TOKEN=... jcode`
 
 ## DeepCode PLUS subscription and LLM routing
 
@@ -267,14 +281,8 @@ Configure PLUS separately in `~/.deepcode-plus/settings.json`:
 }
 ```
 
-PLUS API domains are selected from `env.PLUS_API_KEY` after trimming surrounding whitespace. With `sk-` followed by 24 characters, all services use `https://deepcode.vegamo.cn`. With 26 characters, LLM requests under `/plugin/openai/**` (including `/models` subscription probes and connection warmup) use `https://chat.deepcodeplus.com`; all other services use `https://www.deepcodeplus.com`, including web search, image understanding, image/video generation, telemetry, and cost estimates. Without a key, anonymous plugin requests retain the legacy host. No additional suffix character restriction applies. An explicitly configured invalid value (including an empty string or non-string) produces an error even when `subscriptionPlan=off`. In the URLs below, `{llmHost}` refers to the selected LLM domain.
-
 `subscriptionPlan` accepts `default`, `on`, or `off`; missing or invalid values use `default`. The regular connection retains the user/project/environment precedence described above.
 
-- `default`: Without a PLUS key, use the regular connection. Otherwise, before each session creation or reply, request `GET {llmHost}/plugin/openai/models` with the PLUS key. HTTP 200 means `full ability` and selects PLUS. HTTP 401/403 means `api only` and selects the regular connection, even if its key is missing. Other HTTP statuses, network errors, and a 3-second timeout mean `unknown`: prefer the regular key if configured, otherwise use PLUS.
-- `on`: Use the PLUS key with `{llmHost}/plugin/openai` directly, without a subscription check. A missing PLUS key produces an explicit error without falling back.
+- `default`: If you have a DeepCode Plus subscription, it's considered `on`; otherwise, it's considered `off`.
+- `on`: Use the PLUS key, without a subscription check. A missing PLUS key produces an explicit error without falling back.
 - `off`: Always use the regular connection without checking the subscription.
-
-All LLM calls within a turn share the selected connection. The next turn reloads configuration and checks again. Cancelling the check stops the turn. Existing `/models` connection warmup remains independent of subscription checks and can also run in `on` mode; its result does not change routing.
-
-When the selected connection uses PLUS, the CLI appends `plus` after the model and reasoning effort, for example `deepseek-flash max plus`. These settings control LLM routing and do not change credentials used by PLUS plugin tools.

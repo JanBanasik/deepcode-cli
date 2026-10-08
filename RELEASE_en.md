@@ -1,6 +1,8 @@
 # Release
 
-Deep Code uses three scripts to manage version releases in the monorepo:
+JCode is currently an unpublished personal fork. Use the [local build/install instructions](README-en.md#local-installation). The release procedures below describe inherited upstream tooling and package identifiers; no JCode npm or Marketplace release channel is configured.
+
+JCode uses three scripts to manage version releases in the monorepo:
 
 | Script                       | Command                   | Purpose                                                                                     |
 | ---------------------------- | ------------------------- | ------------------------------------------------------------------------------------------- |

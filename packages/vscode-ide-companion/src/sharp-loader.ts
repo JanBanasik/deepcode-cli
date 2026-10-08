@@ -76,7 +76,9 @@ export function createSharpLoader(
 function findCliAnchors(workspaceRoot: string): string[] {
   const anchors = [path.join(workspaceRoot, "node_modules", "@vegamo", "deepcode-cli", "package.json")];
   const executableNames =
-    process.platform === "win32" ? ["deepcode.cmd", "deepcode.exe", "deepcode.bat"] : ["deepcode"];
+    process.platform === "win32"
+      ? ["jcode.cmd", "jcode.exe", "jcode.bat", "deepcode.cmd", "deepcode.exe", "deepcode.bat"]
+      : ["jcode", "deepcode"];
   for (const directory of (process.env.PATH ?? "").split(path.delimiter).filter(Boolean)) {
     for (const executableName of executableNames) {
       const executable = path.join(directory, executableName);

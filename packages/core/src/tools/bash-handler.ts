@@ -25,7 +25,7 @@ const sessionWorkingDirs = new Map<string, string>();
 // Bound output draining after exit, and completion after a timeout kill attempt.
 const IO_DRAIN_TIMEOUT_MS = 2_000;
 const HELD_PIPE_NOTE =
-  "[deepcode] Output streams did not close within the drain deadline; later output may not have been collected. Use run_in_background: true for detached work.";
+  "[jcode] Output streams did not close within the drain deadline; later output may not have been collected. Use run_in_background: true for detached work.";
 
 export function clearSessionWorkingDir(sessionId: string): void {
   if (!sessionId) {

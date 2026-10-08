@@ -1,6 +1,6 @@
 # AGENTS.md
 
-`AGENTS.md` 是写给 AI 编码助手的项目说明文件。它用于记录长期有效的项目规则，让 Deep Code 在这个仓库中工作时知道如何安装依赖、运行测试、修改代码、提交变更，以及遵守哪些团队约定。
+`AGENTS.md` 是写给 AI 编码助手的项目说明文件。它用于记录长期有效的项目规则，让 JCode 在这个仓库中工作时知道如何安装依赖、运行测试、修改代码、提交变更，以及遵守哪些团队约定。
 
 如果你经常在提示词里重复说明“先运行哪个测试”“不要修改哪个目录”“PR 描述要包含什么”，就适合把这些内容写进 `AGENTS.md`。
 
@@ -31,13 +31,13 @@
 /init
 ```
 
-Deep Code 会帮助你创建或更新 `AGENTS.md`。你也可以手动创建：
+JCode 会帮助你创建或更新 `AGENTS.md`。你也可以手动创建：
 
 ```bash
 touch AGENTS.md
 ```
 
-如果你希望把说明放在 Deep Code 专用目录中，也可以使用：
+如果你希望把说明放在 JCode 专用目录中，也可以使用：
 
 ```bash
 mkdir -p .deepcode
@@ -49,7 +49,7 @@ touch .deepcode/AGENTS.md
 | 文件 | 适合场景 |
 | ---- | -------- |
 | `AGENTS.md` | 希望项目中的不同 AI 编码工具都能读取 |
-| `.deepcode/AGENTS.md` | 希望规则只面向 Deep Code |
+| `.deepcode/AGENTS.md` | 希望规则只面向 JCode |
 | `~/.deepcode/AGENTS.md` | 个人默认偏好，适用于没有项目说明的仓库 |
 
 ## 推荐结构

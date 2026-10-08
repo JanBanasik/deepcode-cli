@@ -2,7 +2,7 @@
   "name": "@vegamo/deepcode-monorepo",
   "version": "0.4.3",
   "private": true,
-  "description": "Deep Code — CLI, core library, and VSCode companion",
+  "description": "JCode — CLI, core library, and VSCode companion",
   "license": "MIT",
   "packageManager": "npm@10.9.4",
   "type": "module",
@@ -11,7 +11,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lessweb/deepcode-cli.git"
+    "url": "git+https://github.com/JanBanasik/deepcode-cli.git"
   },
   "scripts": {
     "typecheck": "npm run typecheck --workspaces --if-present",

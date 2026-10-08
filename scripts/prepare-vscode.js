@@ -127,7 +127,7 @@ const TOTAL_STEPS = 7;
 // ── Banner ───────────────────────────────────────────────────────────────────
 
 log("=========================================");
-log(`  Deep Code VSCode — Publish v${version}`);
+log(`  JCode VSCode — Publish v${version}`);
 log(`  dryRun=${dryRun}  force=${force}`);
 log("=========================================");
 

@@ -33,22 +33,22 @@ First classify the request:
 
      If this skill is loaded from a project-level or different user-level path, use the `scripts/find-skill.js` file next to this `SKILL.md` instead.
 
-   - The script searches the same roots Deep Code CLI scans, in priority order:
+   - The script searches the same roots JCode scans, in priority order:
      1. Project native skills: `./.deepcode/skills/<folder>/SKILL.md`
      2. Project interoperable skills: `./.agents/skills/<folder>/SKILL.md`
      3. User native skills: `~/.deepcode/skills/<folder>/SKILL.md`
      4. User interoperable skills: `~/.agents/skills/<folder>/SKILL.md`
-   - Treat `./` as the current Deep Code project root only; do not scan parent directories unless the running project root is changed.
-   - The script resolves each candidate's skill name the way Deep Code does: use the trimmed frontmatter `name` when present, otherwise use the folder name with underscores converted to hyphens.
+   - Treat `./` as the current JCode project root only; do not scan parent directories unless the running project root is changed.
+   - The script resolves each candidate's skill name the way JCode does: use the trimmed frontmatter `name` when present, otherwise use the folder name with underscores converted to hyphens.
    - Match the user's input against the resolved skill name first. If needed, also consider the folder name or an explicit path the user provided.
    - Treat the matched skill's `path` as the source `SKILL.md` to review.
    - Treat the matched skill's `digestTarget.path` as the only output `SKILL.md` path to create or edit.
-   - `digestTarget.path` always points to the same scope's native Deep Code root:
+   - `digestTarget.path` always points to the same scope's native JCode root:
      - Project sources from `./.deepcode/skills` or `./.agents/skills` digest to `./.deepcode/skills/<folder>/SKILL.md`.
      - User sources from `~/.deepcode/skills` or `~/.agents/skills` digest to `~/.deepcode/skills/<folder>/SKILL.md`.
    - If the script returns one active match, use its `path` for reading and `digestTarget.path` for writing.
    - If the script returns active and shadowed matches, present each source path and digest target path, then use `AskUserQuestion` before using a shadowed source.
-   - If the script returns no match, state that the skill was not found in Deep Code's scanned skill roots and use `AskUserQuestion` to ask whether the user wants to try another name.
+   - If the script returns no match, state that the skill was not found in JCode's scanned skill roots and use `AskUserQuestion` to ask whether the user wants to try another name.
 
 2. Infer the user's preferred language before reviewing.
    - Infer a likely language from the user's wording. For example, if the user says `消化pdf技能`, infer Chinese.

@@ -18,7 +18,7 @@ function run(command, args, label) {
 }
 
 console.log("=========================================");
-console.log("  Deep Code — Build VSCode Companion");
+console.log("  JCode — Build VSCode Companion");
 console.log("=========================================");
 
 run("npm", ["run", "build", "--workspace=@vegamo/deepcode-core"], "1/4 Build core");

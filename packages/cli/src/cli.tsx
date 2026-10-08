@@ -80,7 +80,7 @@ async function main(): Promise<void> {
   }
 
   if (!process.stdin.isTTY) {
-    writeStderrLine("deepcode requires an interactive terminal (TTY). Re-run from a real terminal session.\n");
+    writeStderrLine("jcode requires an interactive terminal (TTY). Re-run from a real terminal session.\n");
     process.exit(1);
   }
 
@@ -171,7 +171,7 @@ function configureWindowsShell(): void {
     setShellIfWindows();
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    writeStderrLine(`deepcode: ${message}\n`);
+    writeStderrLine(`jcode: ${message}\n`);
     process.exit(1);
   }
 }

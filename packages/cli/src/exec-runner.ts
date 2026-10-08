@@ -144,7 +144,7 @@ export async function runExecMode(
       return 130;
     }
     const message = error instanceof Error ? error.message : String(error);
-    deps.writeStderrLine(`deepcode: ${message}`);
+    deps.writeStderrLine(`jcode: ${message}`);
     return 1;
   } finally {
     deps.signalTarget.off("SIGINT", handleSigint);

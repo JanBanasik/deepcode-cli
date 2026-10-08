@@ -1,32 +1,31 @@
-<div align="center">
-<br/>
-<br/>
-<p align="center">
-  <a href='https://deepcode.vegamo.cn/'>
-    <img src='https://avatars.githubusercontent.com/u/118287711?s=200&v=4' width='100' alt="deepcode-cli"/>
-  </a>
-</p>
-<h1>Deep Code CLI</h1>
+# JCode
 
-[![][npm-release-shield]][npm-release-link] [![][npm-downloads-shield]][npm-downloads-link] [![][github-contributors-shield]][github-contributors-link] [![][github-forks-shield]][github-forks-link] [![][github-stars-shield]][github-stars-link]
-[![][github-issues-shield]][github-issues-link] [![][github-issues-pr-shield]][github-issues-pr-link] [![][github-license-shield]][github-license-link]
+JCode 是 [Deep Code](https://github.com/lessweb/deepcode-cli) 的个人 fork，采用 SPECTRE 终端标志、紫色/青色主题和精简的会话状态栏。保留原有 MIT 许可证和版权声明。
 
 [English](README-en.md) · 中文
 
-<br/>
-</div>
+## 本地安装
 
-[Deep Code](https://github.com/lessweb/deepcode-cli) 是专为 `deepseek-v4` 模型优化的终端 AI 编码助手，支持深度思考、推理强度控制、Agent Skills 以及 MCP 集成。
-
-## 安装
+需要 Node.js 22 或更高版本。此 fork 尚未发布到 npm，请从源码构建并使用独立安装前缀：
 
 ```bash
-npm install -g @vegamo/deepcode-cli
+git clone https://github.com/JanBanasik/deepcode-cli.git JCode
+cd JCode
+npm ci
+npm run check
+npm test
+npm run build
+npm install --global --prefix "$HOME/.local/share/jcode" ./packages/cli --ignore-scripts
+export PATH="$HOME/.local/share/jcode/bin:$PATH"
+jcode --version
+jcode --help
 ```
 
-在任意项目目录下运行 `deepcode` 即可启动。
+JCode 与上游共享 `~/.deepcode/settings.json`、项目 `.deepcode/settings.json` 和会话存储，不迁移现有配置。`DEEPCODE_*` 环境覆盖继续有效。Internal workspace packages, VSCode command IDs, and the `deepcode-self-refer` skill identifier retain their upstream names to preserve imports and existing settings.
 
-![intro2](resources/intro3.png)
+![JCode](resources/jcode-120.png)
+
+SPECTRE 标志来自 James Bond；终端图案参考 [DPMA 的示例](https://www.dpma.de/dpma/veroeffentlichungen/hintergrund/dasallalles/jamesbond/index.html)。
 
 ## 配置
 
@@ -44,22 +43,22 @@ npm install -g @vegamo/deepcode-cli
 }
 ```
 
-配置文件与 [Deep Code VSCode 插件](https://github.com/lessweb/deepcode-cli) 共享，无需重复配置。
+配置文件与[上游 Deep Code VSCode 插件](https://github.com/lessweb/deepcode-cli)共享，无需重复配置。
 
 完整配置说明（多层级优先级、环境变量等）请参阅 [docs/configuration.md](docs/configuration.md)。
 
 ## 主要功能
 
 ### **Skills**
-Deep Code CLI 支持 agent skills，允许您扩展助手的能力：
+JCode 支持 agent skills，允许您扩展助手的能力：
 
 Skills 会按以下优先级扫描：
 
 | Scope   | Path                  | Purpose                       |
 | :------ | :-------------------- | :---------------------------- |
-| Project | `./.deepcode/skills/` | Deep Code 原生位置            |
+| Project | `./.deepcode/skills/` | JCode 原生位置            |
 | Project | `./.agents/skills/`   | 跨客户端互操作                |
-| User    | `~/.deepcode/skills/` | Deep Code 原生位置            |
+| User    | `~/.deepcode/skills/` | JCode 原生位置            |
 | User    | `~/.agents/skills/`   | 跨客户端互操作                |
 
 ### **为 DeepSeek 优化**
@@ -102,25 +101,29 @@ Skills 会按以下优先级扫描：
 
 ## 架构和基准测试
 
-Armin Ronacher 在[《Better Models: Worse Tools》](https://lucumr.pocoo.org/2026/7/4/better-models-worse-tools/)中指出，工具 schema 不是「中立的」：模型（LLM）会继承训练和强化学习中形成的工具使用习惯，因此可能在某个主流 harness 中表现很好，却在另一套工具形态下变得不稳定。这正是 Deep Code 的架构出发点：只为 DeepSeek 量身调优，从而让 harness 本身持续贴合 DeepSeek 的行为特点。
+Armin Ronacher 在[《Better Models: Worse Tools》](https://lucumr.pocoo.org/2026/7/4/better-models-worse-tools/)中指出，工具 schema 不是「中立的」：模型（LLM）会继承训练和强化学习中形成的工具使用习惯，因此可能在某个主流 harness 中表现很好，却在另一套工具形态下变得不稳定。这正是 JCode 的架构出发点：只为 DeepSeek 量身调优，从而让 harness 本身持续贴合 DeepSeek 的行为特点。
 
-Deep Code 的收益来自于工具约束、上下文管理、Agent Skills 和权限策略等多项设计叠加后的结果。[deepcode-qrcode-benchmark](https://github.com/qorzj/deepcode-qrcode-benchmark) 项目展示了在一个真实且有难度的 Python 需求上，Deep Code + DeepSeek + `/plan` 模式相较 Claude Code + DeepSeek 的组合具有效果优势。
+上游 Deep Code 的收益来自于工具约束、上下文管理、Agent Skills 和权限策略等多项设计叠加后的结果。[deepcode-qrcode-benchmark](https://github.com/qorzj/deepcode-qrcode-benchmark) 项目展示了在一个真实且有难度的 Python 需求上，Deep Code + DeepSeek + `/plan` 模式相较 Claude Code + DeepSeek 的组合具有效果优势。
 
-> 详见：[Deep Code 架构](docs/architecture.md)
+> 详见：[JCode 架构](docs/architecture.md)
 
 ## 常见问题
 
-### Deep Code 是否有 VSCode 插件？
+### JCode 是否支持子代理？
 
-有的。Deep Code 提供功能完整的 VSCode 插件，可在 [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=vegamo.deepcode-vscode) 安装。插件与 CLI 共享 `~/.deepcode/settings.json` 配置文件，可以在终端和编辑器之间无缝切换。
+JCode 尚不支持原生子代理的启动和管理。Agent Skills 提供可复用的指令，MCP 连接外部工具，`/fork` 创建会话分支。后台 Bash 任务是 Shell 进程；内置工具调用目前按顺序执行。原生子代理功能记录在 [issue #9](https://github.com/JanBanasik/deepcode-cli/issues/9)。
 
-### Deep Code 是否支持理解图片？
+### JCode 是否有 VSCode 配套插件？
+
+本仓库包含 JCode VSCode 配套插件，并兼容已发布的[上游 Deep Code 插件](https://marketplace.visualstudio.com/items?itemName=vegamo.deepcode-vscode)。它们与 CLI 共享 `~/.deepcode/settings.json` 配置。JCode 尚未单独发布到 Marketplace。
+
+### JCode 是否支持理解图片？
 
 支持。`deepseek-flash` 模型支持直接读取本地图片或使用`ctrl+v`从剪贴板粘贴图片，让模型直接看到图片内容。
 
-`deepseek-v4-pro`、`deepseek-v4-flash` 等非多模态模型仍会使用 `UnderstandImage` 识图工具。Deep Code 会自动判断模型能力，也可通过 `multimodal` 配置项手动覆盖。
+`deepseek-v4-pro`、`deepseek-v4-flash` 等非多模态模型仍会使用 `UnderstandImage` 识图工具。JCode 会自动判断模型能力，也可通过 `multimodal` 配置项手动覆盖。
 
-默认情况下，图片会以 base64 内联发送给模型。启用 `filesApiEnabled` 后，Deep Code 会使用 DeepSeek Files API 上传图片并在请求中复用 `file_id`。详见 [docs/configuration.md](docs/configuration.md#deepseek-files-api)。
+默认情况下，图片会以 base64 内联发送给模型。启用 `filesApiEnabled` 后，JCode 会使用 DeepSeek Files API 上传图片并在请求中复用 `file_id`。详见 [docs/configuration.md](docs/configuration.md#deepseek-files-api)。
 
 ### 怎样在任务完成后自动给 Slack 发消息？
 
@@ -128,23 +131,23 @@ Deep Code 的收益来自于工具约束、上下文管理、Agent Skills 和权
 
 ### 怎样启用联网搜索功能？
 
-Deep Code自带免费的、且大部分情况够用的Web Search工具。如果你希望使用自定义脚本进行联网搜索，可以在 `~/.deepcode/settings.json` 中将 `webSearchTool` 设为脚本的完整路径即可。详细步骤可参考：https://github.com/qorzj/web_search_cli
+JCode自带免费的、且大部分情况够用的Web Search工具。如果你希望使用自定义脚本进行联网搜索，可以在 `~/.deepcode/settings.json` 中将 `webSearchTool` 设为脚本的完整路径即可。详细步骤可参考：https://github.com/qorzj/web_search_cli
 
 ### 如何配置 MCP？
 
-Deep Code 支持 MCP（Model Context Protocol），可以连接 GitHub、浏览器、数据库等外部服务。在 `settings.json` 中配置 `mcpServers` 字段即可启用，启动后使用 `/mcp` 命令查看已配置的 MCP 服务器状态和可用工具。
+JCode 支持 MCP（Model Context Protocol），可以连接 GitHub、浏览器、数据库等外部服务。在 `settings.json` 中配置 `mcpServers` 字段即可启用，启动后使用 `/mcp` 命令查看已配置的 MCP 服务器状态和可用工具。
 
 详细配置指南：[docs/mcp.md](docs/mcp.md)
 
-### 如何配置 Deep Code 任务完成后发送通知？
+### 如何配置 JCode 任务完成后发送通知？
 
-当 AI 助手完成一轮任务后，Deep Code 可以自动执行一个通知脚本，将任务结果发送到你指定的渠道（如 Slack、系统通知等）。
+当 AI 助手完成一轮任务后，JCode 可以自动执行一个通知脚本，将任务结果发送到你指定的渠道（如 Slack、系统通知等）。
 
 详细配置指南：[docs/notify.md](docs/notify.md)
 
-### Deep Code 只支持 YOLO 模式吗？
+### JCode 只支持 YOLO 模式吗？
 
-不是。Deep Code 内置了细粒度的权限控制机制，支持在 AI 助手执行 Shell 命令、读写文件、访问网络等操作前进行确认。你可以通过 `settings.json` 中的 `permissions` 字段按需配置每种权限范围的策略：始终允许、始终询问、或直接拒绝。详见 [docs/permission.md](docs/permission.md)。
+不是。JCode 内置了细粒度的权限控制机制，支持在 AI 助手执行 Shell 命令、读写文件、访问网络等操作前进行确认。你可以通过 `settings.json` 中的 `permissions` 字段按需配置每种权限范围的策略：始终允许、始终询问、或直接拒绝。详见 [docs/permission.md](docs/permission.md)。
 
 ### 是否支持 Coding Plan？
 
@@ -167,11 +170,11 @@ Deep Code 支持 MCP（Model Context Protocol），可以连接 GitHub、浏览�
 
 ```bash
 # 克隆仓库
-git clone https://github.com/lessweb/deepcode-cli.git
-cd deepcode-cli
+git clone https://github.com/JanBanasik/deepcode-cli.git JCode
+cd JCode
 
 # 安装依赖
-npm install
+npm ci
 
 # 本地开发（类型检查 + lint + 格式检查 + 构建）
 npm run build
@@ -180,7 +183,8 @@ npm run build
 npm test
 
 # 链接到全局（即本地全局安装）
-npm link
+npm install --global --prefix "$HOME/.local/share/jcode" ./packages/cli --ignore-scripts
+export PATH="$HOME/.local/share/jcode/bin:$PATH"
 ```
 
 - 提交 PR 前请确保 `npm run check` 通过（类型检查 + lint + 格式检查）
@@ -188,7 +192,7 @@ npm link
 
 ## 获取帮助
 
-- 在 GitHub Issues 上报告错误或请求功能 (https://github.com/lessweb/deepcode-cli/issues)
+- 在 GitHub Issues 上报告错误或请求功能 (https://github.com/JanBanasik/deepcode-cli/issues)
 
 ## 协议
 
@@ -198,25 +202,6 @@ npm link
 
 如果你觉得这个工具对你有帮助，请考虑通过以下方式支持我们：
 
-- 在 GitHub 上给我们一个 Star (https://github.com/lessweb/deepcode-cli)
+- 在 GitHub 上给我们一个 Star (https://github.com/JanBanasik/deepcode-cli)
 - 向我们提交反馈和建议
 - 分享给你的朋友和同事
-
-<!-- LINK GROUP -->
-
-[npm-release-link]: https://www.npmjs.com/package/@vegamo/deepcode-cli
-[npm-release-shield]: https://img.shields.io/npm/v/@vegamo/deepcode-cli?color=4d6BFE&labelColor=black&logo=npm&logoColor=white&style=flat-square&cacheSeconds=1800
-[npm-downloads-link]: https://www.npmjs.com/package/@vegamo/deepcode-cli
-[npm-downloads-shield]: https://img.shields.io/npm/dt/@vegamo/deepcode-cli?labelColor=black&style=flat-square&color=4d6BFE&cacheSeconds=1800
-[github-contributors-link]: https://github.com/lessweb/deepcode-cli/graphs/contributors
-[github-contributors-shield]: https://img.shields.io/github/contributors/lessweb/deepcode-cli?color=4d6BFE&labelColor=black&style=flat-square&cacheSeconds=1800
-[github-forks-link]: https://github.com/lessweb/deepcode-cli/network/members
-[github-forks-shield]: https://img.shields.io/github/forks/lessweb/deepcode-cli?color=4d6BFE&labelColor=black&style=flat-square&cacheSeconds=1800
-[github-stars-link]: https://github.com/lessweb/deepcode-cli/network/stargazers
-[github-stars-shield]: https://img.shields.io/github/stars/lessweb/deepcode-cli?color=4d6BFE&labelColor=black&style=flat-square&cacheSeconds=1800
-[github-issues-link]: https://github.com/lessweb/deepcode-cli/issues
-[github-issues-shield]: https://img.shields.io/github/issues/lessweb/deepcode-cli?color=4d6BFE&labelColor=black&style=flat-square&cacheSeconds=1800
-[github-issues-pr-link]: https://github.com/lessweb/deepcode-cli/pulls
-[github-issues-pr-shield]: https://img.shields.io/github/issues-pr/lessweb/deepcode-cli?color=4d6BFE&labelColor=black&style=flat-square&cacheSeconds=1800
-[github-license-link]: https://github.com/lessweb/deepcode-cli/blob/main/LICENSE
-[github-license-shield]: https://img.shields.io/github/license/lessweb/deepcode-cli?color=4d6BFE&labelColor=black&style=flat-square&cacheSeconds=1800

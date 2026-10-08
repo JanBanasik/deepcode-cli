@@ -1,10 +1,10 @@
-# Deep Code Task Completion Notification
+# JCode Task Completion Notification
 
-When the AI assistant finishes a round of tasks, Deep Code can automatically execute a notification script to send task results to your chosen channel (Slack, system notifications, etc.).
+When the AI assistant finishes a round of tasks, JCode can automatically execute a notification script to send task results to your chosen channel (Slack, system notifications, etc.).
 
 ## How It Works
 
-Configure the `notify` field in `settings.json` with the full path to an executable script. Every time the AI assistant completes a task response, Deep Code executes that script and injects context as environment variables.
+Configure the `notify` field in `settings.json` with the full path to an executable script. Every time the AI assistant completes a task response, JCode executes that script and injects context as environment variables.
 
 ## Injected Environment Variables
 
@@ -68,7 +68,7 @@ BRANCH=$(git branch --show-current 2>/dev/null)
 curl -X POST "$SLACK_WEBHOOK_URL" \
   -H "Content-type: application/json" \
   --data "{
-      \"text\": \"✅ Deep Code task completed\n · cwd: $CURRENT_DIR\n · Branch: $BRANCH\n · Duration: $DURATION s\"
+      \"text\": \"✅ JCode task completed\n · cwd: $CURRENT_DIR\n · Branch: $BRANCH\n · Duration: $DURATION s\"
   }"
 ```
 
