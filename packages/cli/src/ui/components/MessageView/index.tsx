@@ -1,3 +1,4 @@
+import { theme } from "../../theme";
 import React from "react";
 import { Box, Text } from "ink";
 import { renderMarkdown, renderMarkdownSegments } from "./markdown";
@@ -42,15 +43,15 @@ export function MessageView({ message, collapsed, width = 80 }: MessageViewProps
       if (collapsed !== false) {
         return (
           <Box marginLeft={1} marginBottom={1} marginY={0}>
-            <StatusLine width={width} bulletColor="gray" name="Thinking" params={summary} />
+            <StatusLine width={width} bulletColor={theme.muted} name="Thinking" params={summary} />
           </Box>
         );
       }
       return (
         <Box marginLeft={1} flexDirection="column" marginBottom={1} marginY={0}>
-          <StatusLine width={width} bulletColor="gray" name="Thinking" params={content ? "" : summary} />
+          <StatusLine width={width} bulletColor={theme.muted} name="Thinking" params={content ? "" : summary} />
           <Box flexDirection="column" marginLeft={2}>
-            {content ? <Text dimColor>{renderMarkdown(content)}</Text> : null}
+            {content ? <Text color={theme.muted}>{renderMarkdown(content)}</Text> : null}
           </Box>
         </Box>
       );
@@ -62,7 +63,7 @@ export function MessageView({ message, collapsed, width = 80 }: MessageViewProps
     return (
       <Box marginLeft={1} marginBottom={1} width={containerWidth} gap={1} marginY={0} flexDirection="row">
         <Box alignSelf="stretch">
-          <Text color="#229ac3">✦</Text>
+          <Text color={theme.primary}>✦</Text>
         </Box>
         <Box flexGrow={1} width={contentWidth} flexDirection="column">
           {content
@@ -89,7 +90,7 @@ export function MessageView({ message, collapsed, width = 80 }: MessageViewProps
   if ((message.role === "system" || message.role === "tool") && message.meta?.skill) {
     return (
       <Box marginY={0} marginLeft={1} marginBottom={1}>
-        <Text color="magenta">⚡ Loaded skill: {message.meta.skill.name}</Text>
+        <Text color={theme.primary}>⚡ Loaded skill: {message.meta.skill.name}</Text>
       </Box>
     );
   }
@@ -102,7 +103,8 @@ export function MessageView({ message, collapsed, width = 80 }: MessageViewProps
       <Box flexDirection="column" marginLeft={1} marginBottom={1} marginY={0}>
         <StatusLine
           width={width}
-          bulletColor={summary.ok ? "green" : "red"}
+          bulletColor={summary.ok ? theme.success : theme.error}
+          symbol={summary.ok ? "✓" : "✗"}
           name={formatStatusName(summary.name)}
           params={formatToolStatusParams(summary)}
         />
@@ -121,7 +123,7 @@ export function MessageView({ message, collapsed, width = 80 }: MessageViewProps
     if (message.meta?.isSummary) {
       return (
         <Box marginY={0} marginLeft={1} marginBottom={1}>
-          <Text dimColor italic>
+          <Text color={theme.muted} italic>
             (conversation summary inserted)
           </Text>
         </Box>
@@ -151,13 +153,15 @@ function PromptEchoLine({
   return (
     <Box marginBottom={1} marginLeft={PROMPT_ECHO_MARGIN_LEFT} marginY={0} width={containerWidth} flexDirection="row">
       <Box width={PROMPT_ECHO_PREFIX_WIDTH}>
-        <Text color="#229ac3">{"> "}</Text>
+        <Text color={theme.primary}>{"> "}</Text>
       </Box>
       <Box flexGrow={1} flexShrink={1} width={contentWidth}>
-        <Text color="#229ac3" wrap="hard">
+        <Text color={theme.primary} wrap="hard">
           {text}
         </Text>
-        {attachmentCount > 0 ? <Text color="#229ac3">{`  📎 ${attachmentCount} image attachment(s)`}</Text> : null}
+        {attachmentCount > 0 ? (
+          <Text color={theme.primary}>{`  📎 ${attachmentCount} image attachment(s)`}</Text>
+        ) : null}
       </Box>
     </Box>
   );
@@ -165,11 +169,13 @@ function PromptEchoLine({
 
 function StatusLine({
   bulletColor,
+  symbol = "✧",
   name,
   params,
   width,
 }: {
-  bulletColor: "gray" | "green" | "red";
+  bulletColor: string | undefined;
+  symbol?: string;
   name: string;
   params: string;
   width: number;
@@ -181,7 +187,7 @@ function StatusLine({
     <Box gap={1} width={containerWidth}>
       <Box alignSelf="stretch">
         <Text key="bullet" color={bulletColor}>
-          ✧
+          {symbol}
         </Text>
       </Box>
       <Box flexGrow={1} width={contentWidth} gap={1}>
@@ -190,7 +196,7 @@ function StatusLine({
             {name}
           </Text>
           {params ? (
-            <Text key="params" color="white">
+            <Text key="params" color={theme.text}>
               {` ${params}`}
             </Text>
           ) : null}
@@ -203,14 +209,14 @@ function StatusLine({
 function DiffPreview({ lines }: { lines: DiffPreviewLine[] }): React.ReactElement {
   return (
     <Box flexDirection="column" marginLeft={2}>
-      <Text dimColor>└ Changes</Text>
+      <Text color={theme.muted}>└ Changes</Text>
       <Box flexDirection="column" marginLeft={2}>
         {lines.map((line, index) => (
           <Text key={`${index}-${line.marker}-${line.content}`} wrap="truncate-end">
-            <Text color={line.kind === "added" ? "green" : line.kind === "removed" ? "red" : "gray"}>
+            <Text color={line.kind === "added" ? theme.success : line.kind === "removed" ? theme.error : theme.muted}>
               {line.marker}
             </Text>
-            <Text color={line.kind === "added" ? "green" : line.kind === "removed" ? "red" : undefined}>
+            <Text color={line.kind === "added" ? theme.success : line.kind === "removed" ? theme.error : undefined}>
               {line.content}
             </Text>
           </Text>
@@ -223,7 +229,7 @@ function DiffPreview({ lines }: { lines: DiffPreviewLine[] }): React.ReactElemen
 function PlanPreview({ lines }: { lines: string[] }): React.ReactElement {
   return (
     <Box flexDirection="column" marginLeft={2}>
-      <Text dimColor>└ Plan</Text>
+      <Text color={theme.muted}>└ Plan</Text>
       <Box flexDirection="column" marginLeft={2}>
         {lines.map((line, index) => (
           <Text key={`${index}-${line}`} wrap="wrap">

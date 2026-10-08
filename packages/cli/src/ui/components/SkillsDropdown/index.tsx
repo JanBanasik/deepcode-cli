@@ -1,3 +1,4 @@
+import { theme } from "../../theme";
 import DropdownMenu from "../DropdownMenu";
 import React, { useEffect, useState } from "react";
 import type { SkillInfo } from "@vegamo/deepcode-core";
@@ -62,10 +63,10 @@ const SkillsDropdown: React.FC<{
         label: skill.name,
         description: skill.path,
         selected: isSkillSelected(selectedSkills, skill),
-        statusIndicator: skill.isLoaded ? { symbol: "✓", color: "green" } : undefined,
+        statusIndicator: skill.isLoaded ? { symbol: "✓", color: theme.success } : undefined,
       }))}
       activeIndex={skillsDropdownIndex}
-      activeColor="#229ac3"
+      activeColor={theme.primary}
       maxVisible={6}
     />
   );

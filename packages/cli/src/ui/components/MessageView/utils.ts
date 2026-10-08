@@ -1,7 +1,7 @@
 import type { DiffPreviewLine, ToolSummary } from "./types";
 import type { SessionMessage } from "@vegamo/deepcode-core";
 import { RawMode } from "../../contexts";
-import chalk from "chalk";
+import { chalk, themeText } from "../../theme";
 import { renderMarkdown } from "./markdown";
 
 /** Type guard that checks whether a value is a plain object (not null, not an array). */
@@ -252,7 +252,8 @@ export function renderMessageToStdout(message: SessionMessage, mode: RawMode): s
   if (message.role === "tool") {
     const summary = buildToolSummary(message);
     const params = formatToolStatusParams(summary);
-    const statusLine = `${chalk("✧")} ${chalk(formatStatusName(summary.name))}${params ? ` ${chalk(params)}` : ""}`;
+    const marker = summary.ok ? themeText.success("✓") : themeText.error("✗");
+    const statusLine = `${marker} ${chalk(formatStatusName(summary.name))}${params ? ` ${chalk(params)}` : ""}`;
 
     const metaResultMd = typeof message.meta?.resultMd === "string" ? message.meta.resultMd.trim() : "";
     const result = metaResultMd ? `\n${chalk.dim("  └ Result")}\n${metaResultMd}` : "";

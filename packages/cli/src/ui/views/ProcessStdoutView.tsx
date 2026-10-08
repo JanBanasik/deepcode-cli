@@ -1,3 +1,4 @@
+import { theme } from "../theme";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Text } from "ink";
 import { BASH_TIMEOUT_DECREMENT_MS, BASH_TIMEOUT_INCREMENT_MS } from "@vegamo/deepcode-core";
@@ -134,7 +135,7 @@ export const ProcessStdoutView = React.memo(function ProcessStdoutView({
     <Box flexDirection="column" width={screenWidth} minWidth={80} height={panelHeight} overflow="hidden">
       <Box borderStyle="single" borderBottom={true} borderLeft={false} borderRight={false} borderTop={false}>
         <Text bold>📟 Process Output</Text>
-        <Text dimColor>{` (${formatTimeoutHint(
+        <Text color={theme.muted}>{` (${formatTimeoutHint(
           timeoutProcess?.entry
         )} · +/- adjust · Ctrl+O or Esc to close · ↑↓ PageUp/PageDown to scroll)`}</Text>
       </Box>
@@ -145,7 +146,7 @@ export const ProcessStdoutView = React.memo(function ProcessStdoutView({
       </Box>
       {statusMessage ? (
         <Box paddingX={1}>
-          <Text dimColor>{statusMessage}</Text>
+          <Text color={theme.muted}>{statusMessage}</Text>
         </Box>
       ) : null}
     </Box>

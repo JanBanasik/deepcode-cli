@@ -1,3 +1,4 @@
+import { theme } from "../theme";
 import React, { useState, useMemo, useCallback } from "react";
 import { Box, Text, useInput, useWindowSize } from "ink";
 import type { SessionEntry, SessionStatus } from "@vegamo/deepcode-core";
@@ -254,8 +255,8 @@ export function SessionList({ sessions, onSelect, onCancel, onDelete, onRename }
   if (sessions.length === 0) {
     return (
       <Box flexDirection="column">
-        <Text color="yellow">No previous sessions found.</Text>
-        <Text dimColor>Press Esc to go back.</Text>
+        <Text color={theme.warning}>No previous sessions found.</Text>
+        <Text color={theme.muted}>Press Esc to go back.</Text>
       </Box>
     );
   }
@@ -269,14 +270,14 @@ export function SessionList({ sessions, onSelect, onCancel, onDelete, onRename }
       paddingX={1}
       marginTop={1}
     >
-      <Box flexDirection="column" borderStyle="round" borderDimColor flexGrow={1} overflow="hidden">
+      <Box flexDirection="column" borderStyle="round" borderColor={theme.border} flexGrow={1} overflow="hidden">
         {/* Header row */}
         <Box paddingX={1} flexDirection="column">
           <Box>
-            <Text bold color="cyanBright">
+            <Text bold color={theme.selection}>
               Resume a session
             </Text>
-            <Text bold color="#229ac3">
+            <Text bold color={theme.primary}>
               {" "}
               ({sessions.length} total
               {hasActiveSearch ? `, ${filteredSessions.length} matched` : ""})
@@ -284,7 +285,7 @@ export function SessionList({ sessions, onSelect, onCancel, onDelete, onRename }
           </Box>
           {/* Search bar */}
           <Box marginTop={hasActiveSearch || searchQuery ? 0 : 0}>
-            <Text dimColor>{searchQuery ? `Search: ${searchQuery}` : "Type to search\u2026"}</Text>
+            <Text color={theme.muted}>{searchQuery ? `Search: ${searchQuery}` : "Type to search\u2026"}</Text>
             {searchQuery ? <Text bold>|</Text> : null}
           </Box>
         </Box>
@@ -296,7 +297,7 @@ export function SessionList({ sessions, onSelect, onCancel, onDelete, onRename }
           borderLeft={false}
           borderRight={false}
           borderStyle="round"
-          borderDimColor
+          borderColor={theme.border}
           flexDirection="column"
           flexGrow={1}
           paddingX={1}
@@ -304,7 +305,7 @@ export function SessionList({ sessions, onSelect, onCancel, onDelete, onRename }
         >
           {filteredSessions.length === 0 ? (
             <Box paddingY={1}>
-              <Text color="yellow">No sessions match "{searchQuery}".</Text>
+              <Text color={theme.warning}>No sessions match "{searchQuery}".</Text>
             </Box>
           ) : (
             visibleSessions.map((session, i) => {
@@ -315,29 +316,29 @@ export function SessionList({ sessions, onSelect, onCancel, onDelete, onRename }
               return (
                 <Box key={session.id} height={2} marginBottom={1}>
                   <Box>
-                    <Text color="#229ac3">{isSelected ? "> " : "  "}</Text>
+                    <Text color={theme.primary}>{isSelected ? "> " : "  "}</Text>
                   </Box>
                   <Box flexDirection="column" flexGrow={1}>
                     <Box width={"100%"}>
                       {isRenaming ? (
-                        <Text color="yellow">
+                        <Text color={theme.warning}>
                           Rename: {renameValue.slice(0, renameCursor)}
                           <Text bold>|</Text>
                           {renameValue.slice(renameCursor)}
                         </Text>
                       ) : (
-                        <Text {...(isSelected ? { bold: true } : {})} color={isSelected ? "#229ac3" : undefined}>
+                        <Text {...(isSelected ? { bold: true } : {})} color={isSelected ? theme.primary : undefined}>
                           {formatSessionTitle(session.summary || "Untitled")}
                         </Text>
                       )}
                       {isConfirming ? (
-                        <Text color="yellow"> [Delete? Enter=yes, Esc=no]</Text>
+                        <Text color={theme.warning}> [Delete? Enter=yes, Esc=no]</Text>
                       ) : isRenaming ? null : (
-                        <Text dimColor> ({formatSessionStatus(session.status)})</Text>
+                        <Text color={theme.muted}> ({formatSessionStatus(session.status)})</Text>
                       )}
                     </Box>
                     <Box width="100%">
-                      <Text dimColor>{formatTimestamp(session.updateTime)} </Text>
+                      <Text color={theme.muted}>{formatTimestamp(session.updateTime)} </Text>
                     </Box>
                   </Box>
                 </Box>
@@ -346,9 +347,11 @@ export function SessionList({ sessions, onSelect, onCancel, onDelete, onRename }
           )}
           {scrollOffset > 0 || scrollOffset + maxVisibleSessions < filteredSessions.length ? (
             <Box marginTop={1}>
-              {scrollOffset > 0 ? <Text dimColor>… {scrollOffset} sessions above. </Text> : null}
+              {scrollOffset > 0 ? <Text color={theme.muted}>… {scrollOffset} sessions above. </Text> : null}
               {scrollOffset + maxVisibleSessions < filteredSessions.length ? (
-                <Text dimColor>… {filteredSessions.length - scrollOffset - maxVisibleSessions} sessions below.</Text>
+                <Text color={theme.muted}>
+                  … {filteredSessions.length - scrollOffset - maxVisibleSessions} sessions below.
+                </Text>
               ) : null}
             </Box>
           ) : null}
@@ -357,36 +360,36 @@ export function SessionList({ sessions, onSelect, onCancel, onDelete, onRename }
         <Box flexDirection="column">
           {renameSessionId ? (
             <Box>
-              <Text color="yellow">Input new session name, </Text>
-              <Text bold color="green">
+              <Text color={theme.warning}>Input new session name, </Text>
+              <Text bold color={theme.success}>
                 Enter
               </Text>
-              <Text dimColor> to save · </Text>
-              <Text bold color="red">
+              <Text color={theme.muted}> to save · </Text>
+              <Text bold color={theme.error}>
                 Esc
               </Text>
-              <Text dimColor> to cancel</Text>
+              <Text color={theme.muted}> to cancel</Text>
             </Box>
           ) : confirmDeleteSessionId ? (
             <Box>
-              <Text color="yellow">Delete this session? </Text>
-              <Text bold color="green">
+              <Text color={theme.warning}>Delete this session? </Text>
+              <Text bold color={theme.success}>
                 Enter
               </Text>
-              <Text dimColor> to confirm · </Text>
-              <Text bold color="red">
+              <Text color={theme.muted}> to confirm · </Text>
+              <Text bold color={theme.error}>
                 Esc
               </Text>
-              <Text dimColor> to cancel</Text>
+              <Text color={theme.muted}> to cancel</Text>
             </Box>
           ) : hasActiveSearch ? (
             <Box>
-              <Text dimColor>Esc clear search · </Text>
-              <Text dimColor>↑/↓ navigate · Enter select · Esc again to cancel</Text>
+              <Text color={theme.muted}>Esc clear search · </Text>
+              <Text color={theme.muted}>↑/↓ navigate · Enter select · Esc again to cancel</Text>
             </Box>
           ) : (
             <Box>
-              <Text dimColor>
+              <Text color={theme.muted}>
                 Type to search · ↑/↓ navigate · PgUp/PgDn page · Enter select · Esc cancel · Del delete · Ctrl+r rename
               </Text>
             </Box>

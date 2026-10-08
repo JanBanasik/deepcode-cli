@@ -1,3 +1,4 @@
+import { theme } from "../../theme";
 import React, { useState } from "react";
 import { useInput } from "ink";
 import DropdownMenu from "../DropdownMenu";
@@ -44,7 +45,7 @@ const RawModelDropdown: React.FC<{
       items={RAW_COMMAND_MODELS.map((model) => ({ ...model, selected: model.key === mode }))}
       helpText="Space/Enter select mode · Esc to close"
       // onSelect={onSelect}
-      activeColor="#229ac3"
+      activeColor={theme.primary}
       maxVisible={6}
       activeIndex={index}
       width={screenWidth}

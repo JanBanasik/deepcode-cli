@@ -1,3 +1,4 @@
+import { theme } from "../theme";
 import { formatSlashCommandDescription, formatSlashCommandLabel } from "../core/slash-commands";
 import type { SlashCommandItem } from "../core/slash-commands";
 import { ARGS_SEPARATOR } from "../constants";
@@ -48,7 +49,7 @@ const SlashCommandMenu = React.memo(function SlashCommandMenu({
     <Box flexDirection="column" marginBottom={1} width={width}>
       {visibleStart > 0 ? (
         <Box marginLeft={2}>
-          <Text dimColor>▲</Text>
+          <Text color={theme.muted}>▲</Text>
         </Box>
       ) : null}
       {visibleItems.map((item, idx) => {
@@ -56,14 +57,14 @@ const SlashCommandMenu = React.memo(function SlashCommandMenu({
         return (
           <Box key={item.label} gap={2} flexDirection="row" flexGrow={1}>
             <Box width={labelColumnWidth} flexShrink={0} gap={2}>
-              <Text color={actualIndex === activeIndex ? "#229ac3" : undefined} wrap="truncate-end">
+              <Text color={actualIndex === activeIndex ? theme.primary : undefined} wrap="truncate-end">
                 {actualIndex === activeIndex ? "> " : "  "}
                 <Text bold>{formatSlashCommandLabel(item)}</Text>
               </Text>
-              {item.args ? <Text dimColor>{item.args.join(ARGS_SEPARATOR)}</Text> : null}
+              {item.args ? <Text color={theme.muted}>{item.args.join(ARGS_SEPARATOR)}</Text> : null}
             </Box>
             <Box flexGrow={1}>
-              <Text color={actualIndex === activeIndex ? "#229ac3" : undefined} wrap="truncate-end" dimColor>
+              <Text color={actualIndex === activeIndex ? theme.primary : undefined} wrap="truncate-end" dimColor>
                 {formatSlashCommandDescription(item.description)}
               </Text>
             </Box>
@@ -71,8 +72,8 @@ const SlashCommandMenu = React.memo(function SlashCommandMenu({
         );
       })}
       <Box marginLeft={2} flexDirection="column">
-        {visibleStart + visibleItems.length < items.length ? <Text dimColor>▼</Text> : null}
-        <Text dimColor>
+        {visibleStart + visibleItems.length < items.length ? <Text color={theme.muted}>▼</Text> : null}
+        <Text color={theme.muted}>
           ({activeIndex + 1}/{items.length}) ↑↓ to navigate · Enter to select
         </Text>
       </Box>

@@ -1,3 +1,4 @@
+import { theme } from "../../theme";
 import React, { useEffect, useState } from "react";
 import { Box, Text } from "ink";
 import { useInput } from "ink";
@@ -93,19 +94,19 @@ const FileMentionMenu: React.FC<Props> = ({ open, width, token, items, onClose, 
         description: item.type === "directory" ? "directory" : "file",
       }))}
       activeIndex={activeIndex}
-      activeColor="#229ac3"
+      activeColor={theme.primary}
       maxVisible={8}
       renderItem={(item, isActive) => (
         <Box flexDirection="row" paddingX={1} gap={1}>
-          <Text color={isActive ? "#229ac3" : undefined}>{isActive ? "> " : "  "}</Text>
+          <Text color={isActive ? theme.primary : undefined}>{isActive ? "> " : "  "}</Text>
           <Box flexGrow={1}>
-            <Text color={isActive ? "#229ac3" : undefined} wrap="truncate-end" bold={isActive}>
+            <Text color={isActive ? theme.primary : undefined} wrap="truncate-end" bold={isActive}>
               {item.label}
             </Text>
           </Box>
           {item.description ? (
             <Box width={10} flexShrink={0}>
-              <Text dimColor>{item.description}</Text>
+              <Text color={theme.muted}>{item.description}</Text>
             </Box>
           ) : null}
         </Box>

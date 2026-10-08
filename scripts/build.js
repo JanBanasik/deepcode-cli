@@ -14,7 +14,7 @@ function run(command, args, label) {
 }
 
 console.log("=========================================");
-console.log("  Deep Code CLI — Build");
+console.log("  JCode — Build");
 console.log("=========================================");
 
 run("npm", ["run", "build", "--workspace=@vegamo/deepcode-core"], "1/3");

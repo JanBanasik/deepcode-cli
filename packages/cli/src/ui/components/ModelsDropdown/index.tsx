@@ -1,3 +1,4 @@
+import { theme } from "../../theme";
 import React, { useEffect, useState } from "react";
 import { useInput } from "ink";
 import DropdownMenu from "../DropdownMenu";
@@ -161,7 +162,7 @@ const ModelsDropdown: React.FC<Props> = ({
       helpText={step === "model" ? "Space/Enter select model · Esc to cancel" : "Space/Enter apply · Esc to cancel"}
       items={items}
       activeIndex={activeIndex}
-      activeColor="#229ac3"
+      activeColor={theme.primary}
       maxVisible={6}
     />
   );

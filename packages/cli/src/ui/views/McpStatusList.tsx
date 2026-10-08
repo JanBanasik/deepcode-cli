@@ -1,3 +1,4 @@
+import { theme } from "../theme";
 import React, { useState, useMemo, useCallback } from "react";
 import { Box, Text, useInput, useWindowSize } from "ink";
 import type { McpServerStatus } from "@vegamo/deepcode-core";
@@ -38,18 +39,18 @@ export function McpStatusList({ statuses, onCancel, onReconnect }: Props): React
 
   if (statuses.length === 0) {
     return (
-      <Box flexDirection="column" marginLeft={1} paddingX={1} gap={1} borderStyle="round" borderDimColor>
+      <Box flexDirection="column" marginLeft={1} paddingX={1} gap={1} borderStyle="round" borderColor={theme.border}>
         <Box flexDirection="column">
-          <Text color="#229ac3" bold>
+          <Text color={theme.primary} bold>
             Manage MCP servers
           </Text>
-          <Text dimColor>0 servers</Text>
+          <Text color={theme.muted}>0 servers</Text>
         </Box>
         <Box flexDirection="column">
-          <Text dimColor>No MCP servers configured.</Text>
-          <Text dimColor>Add MCP servers to your settings to get started.</Text>
+          <Text color={theme.muted}>No MCP servers configured.</Text>
+          <Text color={theme.muted}>Add MCP servers to your settings to get started.</Text>
         </Box>
-        <Text dimColor>Esc to close</Text>
+        <Text color={theme.muted}>Esc to close</Text>
       </Box>
     );
   }
@@ -187,19 +188,19 @@ function ServerListView({
       paddingX={1}
       marginTop={1}
     >
-      <Box flexDirection="column" borderStyle="round" borderDimColor flexGrow={1} overflow="hidden">
+      <Box flexDirection="column" borderStyle="round" borderColor={theme.border} flexGrow={1} overflow="hidden">
         {/* Header row */}
         <Box paddingX={1} gap={1}>
-          <Text bold color="#229ac3">
+          <Text bold color={theme.primary}>
             Manage MCP servers
           </Text>
           <Box gap={1}>
-            <Text dimColor>(</Text>
-            <Text color="green">{readyCount} ready,</Text>
-            <Text color="yellow">{startingCount} starting,</Text>
-            {reconnectingCount > 0 && <Text color="#ff9900">{reconnectingCount} reconnecting,</Text>}
-            <Text color="red">{failedCount} failed</Text>
-            <Text dimColor>)</Text>
+            <Text color={theme.muted}>(</Text>
+            <Text color={theme.success}>{readyCount} ready,</Text>
+            <Text color={theme.warning}>{startingCount} starting,</Text>
+            {reconnectingCount > 0 && <Text color={theme.warning}>{reconnectingCount} reconnecting,</Text>}
+            <Text color={theme.error}>{failedCount} failed</Text>
+            <Text color={theme.muted}>)</Text>
           </Box>
         </Box>
         {/* Items list */}
@@ -209,7 +210,7 @@ function ServerListView({
           borderLeft={false}
           borderRight={false}
           borderStyle="round"
-          borderDimColor
+          borderColor={theme.border}
           flexDirection="column"
           flexGrow={1}
           paddingX={1}
@@ -230,16 +231,16 @@ function ServerListView({
           })}
           {scrollOffset > 0 || scrollOffset + maxVisible < serverCount ? (
             <Box marginTop={1}>
-              {scrollOffset > 0 ? <Text dimColor>… {scrollOffset} servers above. </Text> : null}
+              {scrollOffset > 0 ? <Text color={theme.muted}>… {scrollOffset} servers above. </Text> : null}
               {scrollOffset + maxVisible < serverCount ? (
-                <Text dimColor>… {serverCount - scrollOffset - maxVisible} servers below.</Text>
+                <Text color={theme.muted}>… {serverCount - scrollOffset - maxVisible} servers below.</Text>
               ) : null}
             </Box>
           ) : null}
         </Box>
         {/* Footer */}
         <Box paddingX={1}>
-          <Text dimColor>↑/↓ navigate · Enter view details · Esc close</Text>
+          <Text color={theme.muted}>↑/↓ navigate · Enter view details · Esc close</Text>
         </Box>
       </Box>
     </Box>
@@ -259,12 +260,12 @@ function ServerRow({
     status.status === "ready" ? "✓" : status.status === "failed" ? "✗" : status.status === "reconnecting" ? "↻" : "●";
   const color =
     status.status === "ready"
-      ? "green"
+      ? theme.success
       : status.status === "failed"
-        ? "red"
+        ? theme.error
         : status.status === "reconnecting"
-          ? "#ff9900"
-          : "yellow";
+          ? theme.warning
+          : theme.warning;
 
   // 加载动画：循环显示 (空) → . → .. → ... → (空) → ...
   const [dots, setDots] = React.useState(0);
@@ -290,14 +291,14 @@ function ServerRow({
       {/* Server row */}
       <Box gap={2}>
         <Box width={labelColumnWidth} flexShrink={0}>
-          <Text color={selected ? "#229ac3" : undefined}>
+          <Text color={selected ? theme.primary : undefined}>
             {selected ? "> " : "  "}
             <Text color={color}>{icon} </Text>
             <Text bold>{status.name}</Text>
           </Text>
         </Box>
         <Box flexGrow={1}>
-          <Text dimColor>{detail}</Text>
+          <Text color={theme.muted}>{detail}</Text>
         </Box>
       </Box>
 
@@ -415,12 +416,12 @@ function ServerDetailView({
     server.status === "ready" ? "✓" : server.status === "failed" ? "✗" : server.status === "reconnecting" ? "↻" : "●";
   const statusColor =
     server.status === "ready"
-      ? "green"
+      ? theme.success
       : server.status === "failed"
-        ? "red"
+        ? theme.error
         : server.status === "reconnecting"
-          ? "#ff9900"
-          : "yellow";
+          ? theme.warning
+          : theme.warning;
 
   return (
     <Box
@@ -431,14 +432,14 @@ function ServerDetailView({
       paddingX={1}
       marginTop={1}
     >
-      <Box flexDirection="column" borderStyle="round" borderDimColor flexGrow={1} overflow="hidden">
+      <Box flexDirection="column" borderStyle="round" borderColor={theme.border} flexGrow={1} overflow="hidden">
         {/* Header row */}
         <Box paddingX={1} gap={1}>
           <Text color={statusColor}>{statusIcon} </Text>
-          <Text bold color="#229ac3" wrap="truncate-end">
+          <Text bold color={theme.primary} wrap="truncate-end">
             {server.name}
           </Text>
-          <Text dimColor>— {server.status === "ready" ? "Details" : "Status"}</Text>
+          <Text color={theme.muted}>— {server.status === "ready" ? "Details" : "Status"}</Text>
         </Box>
         {/* Server info */}
         <Box paddingX={1} marginLeft={3}>
@@ -461,7 +462,7 @@ function ServerDetailView({
           borderLeft={false}
           borderRight={false}
           borderStyle="round"
-          borderDimColor
+          borderColor={theme.border}
           flexDirection="column"
           flexGrow={1}
           paddingX={1}
@@ -469,7 +470,7 @@ function ServerDetailView({
         >
           {visibleStart > 0 ? (
             <Box>
-              <Text dimColor>▲</Text>
+              <Text color={theme.muted}>▲</Text>
             </Box>
           ) : (
             <Text> </Text>
@@ -477,7 +478,7 @@ function ServerDetailView({
           <Box paddingX={1} flexDirection="column">
             {visibleItems.length === 0 ? (
               <Box paddingY={1}>
-                <Text dimColor>No items available</Text>
+                <Text color={theme.muted}>No items available</Text>
               </Box>
             ) : (
               visibleItems.map((item, idx) => {
@@ -489,17 +490,17 @@ function ServerDetailView({
           </Box>
           {visibleStart > 0 || visibleStart + maxVisible < totalItems ? (
             <Box marginTop={1} gap={1}>
-              {totalItems - visibleStart - maxVisible > 0 ? <Text dimColor>▼</Text> : <Text> </Text>}
-              {visibleStart > 0 ? <Text dimColor>… {visibleStart} items above. </Text> : null}
+              {totalItems - visibleStart - maxVisible > 0 ? <Text color={theme.muted}>▼</Text> : <Text> </Text>}
+              {visibleStart > 0 ? <Text color={theme.muted}>… {visibleStart} items above. </Text> : null}
               {totalItems - visibleStart - maxVisible > 0 ? (
-                <Text dimColor>… {totalItems - visibleStart - maxVisible} items below.</Text>
+                <Text color={theme.muted}>… {totalItems - visibleStart - maxVisible} items below.</Text>
               ) : null}
             </Box>
           ) : null}
         </Box>
         {/* Footer */}
         <Box paddingX={1}>
-          <Text dimColor>
+          <Text color={theme.muted}>
             {hasReconnect
               ? "Enter to reconnect · Esc back · Ctrl+C close"
               : canScroll
@@ -515,12 +516,12 @@ function ServerDetailView({
 function ItemRow({ item, selected }: { item: { type: string; name: string }; selected: boolean }): React.ReactElement {
   const isAction = item.type === "action";
   const icon = isAction ? "↻" : item.type === "tool" ? "🔧" : item.type === "prompt" ? "📝" : "📦";
-  const color = isAction && selected ? "#ff9900" : selected ? "#229ac3" : undefined;
+  const color = isAction && selected ? theme.warning : selected ? theme.primary : undefined;
 
   return (
     <Box height={1} flexDirection="row">
-      <Text color={selected ? "#229ac3" : undefined}>{selected ? "> " : "  "}</Text>
-      <Text dimColor>{icon} </Text>
+      <Text color={selected ? theme.primary : undefined}>{selected ? "> " : "  "}</Text>
+      <Text color={theme.muted}>{icon} </Text>
       <Text color={color} dimColor={!selected} bold={isAction} wrap="truncate-end">
         {isAction ? `[${item.name}]` : item.name}
       </Text>
@@ -539,12 +540,11 @@ function ErrorRow({ error }: { error: string }): React.ReactElement {
       marginTop={0}
       marginBottom={0}
       borderStyle="round"
-      borderColor="red"
-      borderDimColor
+      borderColor={theme.error}
     >
       {lines.map((line, index) => (
         <Box key={index}>
-          <Text color="red" dimColor>
+          <Text color={theme.error} dimColor>
             {line}
           </Text>
         </Box>

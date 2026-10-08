@@ -1,7 +1,8 @@
+import { chalk, theme, themeText, terminalColor } from "../theme";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Text, useStdout } from "ink";
 import type { DOMElement } from "ink";
-import chalk from "chalk";
+import { stripVTControlCharacters } from "node:util";
 import { ARGS_SEPARATOR } from "../constants";
 import {
   EMPTY_BUFFER,
@@ -90,6 +91,7 @@ type Props = {
   screenWidth: number;
   promptHistory: string[];
   busy: boolean;
+  queuedPrompts?: readonly PromptSubmission[];
   cursorLayoutKey?: string;
   loadingText?: string | null;
   disabled?: boolean;
@@ -109,11 +111,13 @@ type Props = {
 };
 
 const PROMPT_PREFIX_WIDTH = 2;
+const EMPTY_QUEUED_PROMPTS: readonly PromptSubmission[] = [];
+const MAX_QUEUED_PROMPT_PREVIEWS = 3;
 
 const PromptPrefixLine = React.memo(function PromptPrefixLine(): React.ReactElement {
   return (
     <Box width={PROMPT_PREFIX_WIDTH}>
-      <Text color="#229ac3">{"> "}</Text>
+      <Text color={theme.primary}>{"> "}</Text>
     </Box>
   );
 });
@@ -125,6 +129,7 @@ export const PromptInput = React.memo(function PromptInput({
   screenWidth,
   promptHistory,
   busy,
+  queuedPrompts = EMPTY_QUEUED_PROMPTS,
   cursorLayoutKey,
   loadingText,
   disabled,
@@ -219,6 +224,11 @@ export const PromptInput = React.memo(function PromptInput({
     [showMenu, showSkillsDropdown, showModelDropdown, openRawModelDropdown, showFileMentionMenu]
   );
   const inputContentWidth = Math.max(1, screenWidth - PROMPT_PREFIX_WIDTH);
+  const queuedPromptPreviews = useMemo(
+    () => queuedPrompts.slice(0, MAX_QUEUED_PROMPT_PREVIEWS).map(formatQueuedPromptPreview),
+    [queuedPrompts]
+  );
+  const remainingQueuedPromptCount = queuedPrompts.length - queuedPromptPreviews.length;
 
   const cursorPlacement = useMemo(
     () => getPromptCursorPlacement(buffer, inputContentWidth),
@@ -243,10 +253,10 @@ export const PromptInput = React.memo(function PromptInput({
   const terminalCursorActive = usePromptTerminalCursor(
     inputTextRef,
     cursorPlacement,
-    !busy && usePositionedCursor,
+    usePositionedCursor,
     promptCursorLayoutKey
   );
-  useHiddenTerminalCursor(stdout, !disabled && (busy || !terminalCursorActive));
+  useHiddenTerminalCursor(stdout, !disabled && !terminalCursorActive);
 
   const refreshFileMentionItems = React.useCallback(() => {
     setFileMentionItems(scanFileMentionItems(projectRoot));
@@ -434,7 +444,6 @@ export const PromptInput = React.memo(function PromptInput({
 
       const noModifier = !key.shift && !key.ctrl && !key.meta;
       const returnAction = getPromptReturnKeyAction(key);
-      const isPlainReturn = returnAction === "submit";
 
       if (key.shift && key.tab) {
         onPlanModeChange(!planMode);
@@ -463,11 +472,6 @@ export const PromptInput = React.memo(function PromptInput({
             return;
           }
         }
-      }
-
-      if (busy && isPlainReturn) {
-        setStatusMessage("wait for the current response or press esc to interrupt");
-        return;
       }
 
       if (returnAction === "newline") {
@@ -744,11 +748,6 @@ export const PromptInput = React.memo(function PromptInput({
   }
 
   function submitCurrentBuffer(): void {
-    if (busy) {
-      setStatusMessage("wait for the current response or press esc to interrupt");
-      return;
-    }
-
     const trimmed = buffer.text.trim();
     if (!trimmed && imageUrls.length === 0 && selectedSkills.length === 0) {
       return;
@@ -792,22 +791,22 @@ export const PromptInput = React.memo(function PromptInput({
     <Box flexDirection="column" width={screenWidth}>
       {imageUrls.length > 0 ? (
         <Box>
-          <Text color="magenta">{formatImageAttachmentStatus(imageUrls.length)}</Text>
-          <Text dimColor>{` (${IMAGE_ATTACHMENT_CLEAR_HINT})`}</Text>
+          <Text color={theme.primary}>{formatImageAttachmentStatus(imageUrls.length)}</Text>
+          <Text color={theme.muted}>{` (${IMAGE_ATTACHMENT_CLEAR_HINT})`}</Text>
         </Box>
       ) : null}
       {selectedSkills.length > 0 ? (
         <Box>
-          <Text color="magenta" wrap="truncate-end">
+          <Text color={theme.primary} wrap="truncate-end">
             {formatSelectedSkillsStatus(selectedSkills)}
           </Text>
-          <Text dimColor> (use /skills to edit)</Text>
+          <Text color={theme.muted}> (use /skills to edit)</Text>
         </Box>
       ) : null}
       {planMode ? (
         <Box width={screenWidth} justifyContent="flex-end">
-          <Text color="yellow">💡 Plan mode</Text>
-          <Text dimColor> (shift+tab to cycle)</Text>
+          <Text color={theme.warning}>💡 Plan mode</Text>
+          <Text color={theme.muted}> (shift+tab to cycle)</Text>
         </Box>
       ) : null}
       {/* Input */}
@@ -818,7 +817,7 @@ export const PromptInput = React.memo(function PromptInput({
         borderBottom={true}
         borderLeft={false}
         borderRight={false}
-        borderDimColor
+        borderColor={theme.border}
       >
         <PromptPrefixLine />
         <Box ref={inputTextRef} flexGrow={1} flexShrink={1} width={inputContentWidth}>
@@ -828,12 +827,25 @@ export const PromptInput = React.memo(function PromptInput({
               !disabled && hasTerminalFocus,
               placeholder,
               pastesRef.current,
-              !busy && !terminalCursorActive
+              !terminalCursorActive
             )}
           </Text>
-          {inlineHint ? <Text dimColor>{inlineHint}</Text> : null}
+          {inlineHint ? <Text color={theme.muted}>{inlineHint}</Text> : null}
         </Box>
       </Box>
+      {queuedPrompts.length > 0 ? (
+        <Box flexDirection="column" width={screenWidth}>
+          <Text color={theme.secondary}>{formatQueuedPromptStatus(queuedPrompts.length)}</Text>
+          {queuedPromptPreviews.map((preview, index) => (
+            <Text key={index} dimColor wrap="truncate-end">
+              {`${index + 1}. ${preview}`}
+            </Text>
+          ))}
+          {remainingQueuedPromptCount > 0 ? (
+            <Text color={theme.muted}>{`… ${remainingQueuedPromptCount} more queued`}</Text>
+          ) : null}
+        </Box>
+      ) : null}
       <RawModelDropdown
         open={openRawModelDropdown}
         onClose={setOpenRawModelDropdown}
@@ -871,7 +883,7 @@ export const PromptInput = React.memo(function PromptInput({
       <SlashCommandMenu width={screenWidth} items={slashMenu} activeIndex={menuIndex} />
       {!showFooterText && (
         <Box>
-          <Text dimColor wrap="truncate-end">
+          <Text color={theme.muted} wrap="truncate-end">
             {footerText}
           </Text>
         </Box>
@@ -892,11 +904,11 @@ export const PromptInput = React.memo(function PromptInput({
               lines.push(currentLine);
             }
             return lines.map((line, lineIndex) => (
-              <Box key={lineIndex}>
+              <Box key={lineIndex} width={screenWidth}>
                 {line.map((segment, index) => (
                   <React.Fragment key={segment.id}>
-                    {index > 0 && <Text dimColor>{statusLineSeparator ?? " · "}</Text>}
-                    <Text color={segment.color} dimColor={!segment.color}>
+                    {index > 0 && <Text color={theme.muted}>{statusLineSeparator ?? " · "}</Text>}
+                    <Text color={terminalColor(segment.color)} dimColor={!segment.color} wrap="truncate-end">
                       {segment.text}
                     </Text>
                   </React.Fragment>
@@ -917,6 +929,28 @@ export function formatImageAttachmentStatus(count: number): string {
     return "";
   }
   return `📎 ${count} image${count === 1 ? "" : "s"} attached`;
+}
+
+export function formatQueuedPromptStatus(count: number): string {
+  if (count <= 0) {
+    return "";
+  }
+  return `⏳ ${count} prompt${count === 1 ? "" : "s"} queued`;
+}
+
+export function formatQueuedPromptPreview(submission: PromptSubmission): string {
+  const text = stripVTControlCharacters(submission.text).replace(/\s+/g, " ").trim();
+  if (text) {
+    return text;
+  }
+  const details: string[] = [];
+  if (submission.imageUrls.length > 0) {
+    details.push(formatImageAttachmentStatus(submission.imageUrls.length));
+  }
+  if (submission.selectedSkills?.length) {
+    details.push(formatSelectedSkillsStatus(submission.selectedSkills));
+  }
+  return details.join(" · ") || "[Empty prompt]";
 }
 
 export function formatSelectedSkillsStatus(skills: SkillInfo[]): string {
@@ -1022,7 +1056,7 @@ function highlightPasteMarkersInText(s: string, validIds: Map<number, string>): 
   while ((match = PASTE_MARKER_REGEX.exec(s)) !== null) {
     result += s.slice(pos, match.index);
     const id = Number.parseInt(match[1]!, 10);
-    result += validIds.has(id) ? chalk.yellow(match[0]) : match[0];
+    result += validIds.has(id) ? themeText.secondary(match[0]) : match[0];
     pos = match.index + match[0].length;
   }
   result += s.slice(pos);
@@ -1080,12 +1114,12 @@ function renderTextSegmentWithCursor(
 
   // Cursor not in this segment – just return the text.
   if (cursorRel < 0 || cursorRel > segText.length) {
-    return highlighted ? chalk.yellow(segText) : segText;
+    return highlighted ? themeText.secondary(segText) : segText;
   }
 
   // Cursor is exactly at `end` (which equals `segText.length`).
   if (cursorRel === segText.length) {
-    return highlighted ? chalk.yellow(segText) + renderCursorCell(" ") : segText + renderCursorCell(" ");
+    return highlighted ? themeText.secondary(segText) + renderCursorCell(" ") : segText + renderCursorCell(" ");
   }
 
   // Cursor is somewhere inside the segment.
@@ -1101,7 +1135,7 @@ function renderTextSegmentWithCursor(
   const before = segText.slice(0, cursorRel);
   const after = segText.slice(cursorRel + 1);
   if (highlighted) {
-    return chalk.yellow(before) + renderCursorCell(at) + chalk.yellow(after);
+    return themeText.secondary(before) + renderCursorCell(at) + themeText.secondary(after);
   }
   return before + renderCursorCell(at) + after;
 }

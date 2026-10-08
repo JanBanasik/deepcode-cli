@@ -1,7 +1,7 @@
 {
   "name": "@vegamo/deepcode-cli",
   "version": "0.4.3",
-  "description": "Deep Code CLI - Vibe coding for the deepseek-v4 model in your terminal",
+  "description": "JCode — personal Deep Code fork for DeepSeek in your terminal",
   "license": "MIT",
   "type": "module",
   "repository": {
@@ -10,7 +10,7 @@
   },
   "homepage": "https://deepcode.vegamo.cn",
   "bin": {
-    "deepcode": "./dist/cli.js"
+    "jcode": "./dist/cli.js"
   },
   "main": "./dist/cli.js",
   "files": [
@@ -47,5 +47,6 @@
   },
   "devDependencies": {
     "@types/yargs": "^17.0.35"
-  }
+  },
+  "private": true
 }

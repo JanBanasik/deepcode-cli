@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
+import { chmodSync, cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -48,3 +48,4 @@ if (existsSync(bundledSkillsSrc)) {
 }
 
 console.log("\n✅  All bundle assets copied.\n");
+chmodSync(join(distDir, "cli.js"), 0o755);

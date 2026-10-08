@@ -210,12 +210,23 @@ test("renderMessageToStdout renders assistant thinking messages with ✧ Thinkin
   assert.ok(output.includes("Plan: Analyze the code"));
 });
 
-test("renderMessageToStdout renders tool messages with ✧ and tool name", () => {
+test("renderMessageToStdout renders tool messages with a success marker and tool name", () => {
   const payload = JSON.stringify({ name: "read", ok: true });
   const msg = makeSessionMessage({ role: "tool", content: payload });
   const output = renderMessageToStdout(msg, RawMode.Raw);
-  assert.ok(output.includes("✧"));
+  assert.ok(output.includes("✓"));
   assert.ok(output.includes("Read"));
+});
+
+test("tool failure uses a distinct marker even without terminal colors", () => {
+  const msg = makeSessionMessage({
+    role: "tool",
+    content: JSON.stringify({ name: "read", ok: false, error: "Fixture read failed" }),
+  });
+  const output = renderMessageToStdout(msg, RawMode.Raw);
+  assert.ok(output.includes("✗"));
+  assert.ok(output.includes("Read"));
+  assert.ok(!output.includes("✓"));
 });
 
 test("renderMessageToStdout renders tool messages with resultMd output", () => {
@@ -226,7 +237,7 @@ test("renderMessageToStdout renders tool messages with resultMd output", () => {
     meta: { resultMd: "File content:\n  line 1\n  line 2" },
   });
   const output = renderMessageToStdout(msg, RawMode.Raw);
-  assert.ok(output.includes("✧"));
+  assert.ok(output.includes("✓"));
   assert.ok(output.includes("Read"));
   assert.ok(output.includes("└ Result"));
   assert.ok(output.includes("File content:"));

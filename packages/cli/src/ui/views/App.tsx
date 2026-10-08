@@ -1,6 +1,6 @@
+import { theme, themeText } from "../theme";
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Box, Static, Text, useApp, useStdout, useWindowSize } from "ink";
-import chalk from "chalk";
 import { createOpenAIClientFactory } from "@vegamo/deepcode-core";
 import type { PermissionScope } from "@vegamo/deepcode-core";
 import { type ModelConfigSelection } from "@vegamo/deepcode-core";
@@ -11,6 +11,7 @@ import { type UndoRestoreMode, UndoSelector } from "./UndoSelector";
 import { StatusLine } from "../components/status-line";
 import { buildLoadingText } from "../core/loading-text";
 import { findExpandedThinkingId } from "../core/thinking-state";
+import { createPromptQueue } from "../core/prompt-queue";
 import { WelcomeScreen } from "./WelcomeScreen";
 import { AskUserQuestionPrompt } from "./AskUserQuestionPrompt";
 import { McpStatusList } from "./McpStatusList";
@@ -34,7 +35,6 @@ import { renderMessageToStdout } from "../components/MessageView/utils";
 import {
   buildPromptDraftFromSessionMessage,
   buildPromptHistory,
-  buildStatusLine,
   buildSyntheticUserMessage,
   formatModelConfig,
   isCurrentSessionEmpty,
@@ -58,6 +58,10 @@ import type {
 } from "@vegamo/deepcode-core";
 import { SessionManager } from "@vegamo/deepcode-core";
 import { writeStdout, writeStdoutLine } from "../../utils/stdio-helpers";
+import { readSettings, readProjectSettings } from "@vegamo/deepcode-core";
+import { useGitBranch } from "../hooks/useGitBranch";
+import { SessionStatus as CompactSessionStatus } from "../components/session-status";
+import { getStatusContextLimit, formatSessionActivity } from "../statusline/session-status";
 
 type View = "chat" | "session-list" | "undo" | "mcp-status";
 
@@ -82,8 +86,10 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
   const writeRef = useRef(write);
   const lastRenderedColumnsRef = useRef<number | null>(null);
   const messagesRef = useRef<SessionMessage[]>([]);
+  const handlePromptRef = useRef<((submission: PromptSubmission) => Promise<void>) | null>(null);
   const [view, setView] = useState<View>("chat");
   const [busy, setBusy] = useState(false);
+  const [queuedPrompts, setQueuedPrompts] = useState<readonly PromptSubmission[]>([]);
   const [skills, setSkills] = useState<SkillInfo[]>([]);
   const [messages, setMessages] = useState<SessionMessage[]>([]);
   const [sessions, setSessions] = useState<SessionEntry[]>([]);
@@ -131,7 +137,8 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
         }
       },
       onSessionEntryUpdated: (entry) => {
-        setStatusLine(buildStatusLine(entry, resolveCurrentSettings(projectRoot)));
+        setResolvedSettings(resolveCurrentSettings(projectRoot));
+        setStatusLine(formatSessionActivity(entry));
         setRunningProcesses(entry.processes);
         setActiveStatus(entry.status);
         setActiveAskPermissions(entry.askPermissions);
@@ -292,7 +299,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
 
         writeStdoutLine("\n");
         if (showCommand) {
-          writeStdoutLine(chalk.rgb(34, 154, 195)(" > /exit "));
+          writeStdoutLine(themeText.primary(" > /exit "));
           writeStdoutLine("\n");
         }
         if (showSummary) {
@@ -346,7 +353,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
           sessionManager.setActiveSessionId(sessionId);
           await resetStaticView(loadVisibleMessages(sessionManager, sessionId), { clearScreen: true });
           const session = sessionManager.getSession(sessionId);
-          setStatusLine(session ? buildStatusLine(session, resolveCurrentSettings(projectRoot)) : "");
+          setStatusLine(session ? formatSessionActivity(session) : "");
           setRunningProcesses(null);
           setActiveStatus(session?.status ?? null);
           setActiveAskPermissions(undefined);
@@ -464,13 +471,37 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
       resetToWelcome,
       resetStaticView,
       planMode,
-      projectRoot,
     ]
   );
 
+  handlePromptRef.current = handlePrompt;
+
+  const promptQueue = useMemo(
+    () =>
+      createPromptQueue<PromptSubmission>(
+        (submission) => {
+          const handler = handlePromptRef.current;
+          return handler ? handler(submission) : Promise.resolve();
+        },
+        (error) => setErrorLine(error instanceof Error ? error.message : String(error))
+      ),
+    []
+  );
+
+  useEffect(() => {
+    const unsubscribe = promptQueue.subscribe(() => setQueuedPrompts(promptQueue.items));
+    return () => {
+      unsubscribe();
+      promptQueue.interrupt();
+    };
+  }, [promptQueue]);
+
   const handleInterrupt = useCallback(() => {
+    // Interrupting abandons the queued workflow too: drop any prompts the user
+    // submitted while this run was active so they are not executed next.
+    promptQueue.interrupt();
     sessionManager.interruptActiveSession();
-  }, [sessionManager]);
+  }, [promptQueue, sessionManager]);
 
   const handleToggleProcessStdout = useCallback(() => {
     setShowProcessStdout(true);
@@ -505,7 +536,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
       if (activeSessionId) {
         sessionManager.addSessionSystemMessage(activeSessionId, content, true, meta);
         const activeSession = sessionManager.getSession(activeSessionId);
-        setStatusLine(activeSession ? buildStatusLine(activeSession, next) : "");
+        setStatusLine(activeSession ? formatSessionActivity(activeSession) : "");
       } else {
         const now = new Date().toISOString();
         setMessages((prev) => [
@@ -533,9 +564,9 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
 
   const handleSubmit = useCallback(
     (submission: PromptSubmission) => {
-      void handlePrompt(submission);
+      promptQueue.submit(submission);
     },
-    [handlePrompt]
+    [promptQueue]
   );
 
   const handlePlanImplementationChoice = useCallback(
@@ -584,7 +615,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
       // Clear first so <Static> resets its index to 0.
       await resetStaticView(loadVisibleMessages(sessionManager, sessionId), { clearScreen: true });
       const session = sessionManager.getSession(sessionId);
-      setStatusLine(session ? buildStatusLine(session, resolveCurrentSettings(projectRoot)) : "");
+      setStatusLine(session ? formatSessionActivity(session) : "");
       setRunningProcesses(session?.processes ?? null);
       setActiveStatus(session?.status ?? null);
       setActiveAskPermissions(session?.askPermissions);
@@ -595,7 +626,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
       }
       await refreshSkills(sessionId);
     },
-    [sessionManager, resetStaticView, pendingPermissionReply, projectRoot, refreshSkills]
+    [sessionManager, resetStaticView, pendingPermissionReply, refreshSkills]
   );
 
   /**
@@ -782,6 +813,18 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
 
   const screenWidth = useMemo(() => columns ?? stdout?.columns ?? 80, [columns, stdout]);
   const screenHeight = useMemo(() => rows ?? stdout?.rows ?? 24, [rows, stdout]);
+  const gitBranch = useGitBranch(projectRoot, busy);
+  const contextLimit = useMemo(
+    () =>
+      getStatusContextLimit(resolvedSettings.model, resolvedSettings.contextWindow, [
+        process.env.DEEPCODE_CONTEXT_WINDOW,
+        readProjectSettings(projectRoot)?.contextWindow,
+        readSettings()?.contextWindow,
+      ]),
+    [projectRoot, resolvedSettings]
+  );
+  const activeSessionId = sessionManager.getActiveSessionId();
+  const statusSession = activeSessionId ? sessionManager.getSession(activeSessionId) : null;
   const getSessionInfo = useCallback((): SessionInfo | null => {
     const activeSessionId = sessionManager.getActiveSessionId();
     const settings = resolveCurrentSettings(projectRoot);
@@ -912,13 +955,15 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
 
   const handleQuestionAnswers = useCallback(
     (answers: AskUserQuestionAnswers) => {
-      void handlePrompt({
+      // Routed through handleSubmit so the answer run is serialized with the
+      // prompt queue instead of starting a second concurrent run.
+      handleSubmit({
         text: formatAskUserQuestionAnswers(answers),
         imageUrls: [],
         isAnswers: true,
       });
     },
-    [handlePrompt]
+    [handleSubmit]
   );
 
   const handleQuestionCancel = useCallback(() => {
@@ -945,7 +990,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
         sessionManager.denySessionPermission(sessionId);
         return;
       }
-      void handlePrompt({
+      handleSubmit({
         text: "/continue",
         imageUrls: [],
         command: "continue",
@@ -953,16 +998,16 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
         alwaysAllows: result.alwaysAllows,
       });
     },
-    [handlePrompt, sessionManager]
+    [handleSubmit, sessionManager]
   );
 
   const handlePermissionCancel = useCallback(() => {
-    sessionManager.interruptActiveSession();
+    handleInterrupt();
     setActiveStatus("interrupted");
     setActiveAskPermissions(undefined);
     setPromptDraft(null);
     refreshSessionsList();
-  }, [refreshSessionsList, sessionManager]);
+  }, [handleInterrupt, refreshSessionsList]);
 
   if (mode === RawMode.Raw) {
     return <RawModeExitPrompt onExit={(prev) => handleRawModeChange(prev)} />;
@@ -996,7 +1041,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
       {(busy || statusLine) && !isExiting ? <StatusLine busy={busy} text={statusLine} width={screenWidth} /> : null}
       {errorLine ? (
         <Box>
-          <Text color="red">Error: {errorLine}</Text>
+          <Text color={theme.error}>Error: {errorLine}</Text>
         </Box>
       ) : null}
       {showProcessStdout ? (
@@ -1069,6 +1114,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
           modelConfig={resolvedSettings}
           promptHistory={promptHistory}
           busy={busy}
+          queuedPrompts={queuedPrompts}
           cursorLayoutKey={promptCursorLayoutKey}
           loadingText={loadingText}
           runningProcesses={runningProcesses}
@@ -1086,6 +1132,15 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
           onPlanModeChange={setPlanMode}
         />
       )}
+      {!isExiting ? (
+        <CompactSessionStatus
+          model={resolvedSettings.model}
+          contextWindow={contextLimit}
+          session={statusSession}
+          gitBranch={gitBranch}
+          width={screenWidth}
+        />
+      ) : null}
     </Box>
   );
 }

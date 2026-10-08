@@ -1,3 +1,4 @@
+import { theme } from "../../theme";
 import React, { useMemo } from "react";
 import { Box, Text } from "ink";
 
@@ -16,7 +17,7 @@ export type DropdownMenuItem = {
   /** Whether to show a special status indicator (e.g., loaded checkmark) */
   statusIndicator?: {
     symbol: string;
-    color: string;
+    color?: string;
   };
 };
 
@@ -34,9 +35,9 @@ type DropdownMenuProps = {
   width: number;
   /** Optional title displayed at the top */
   title?: string;
-  /** Color for the title (default: "magenta") */
+  /** Color for the title (default: primary accent) */
   titleColor?: string;
-  /** Color for the active item indicator (default: "cyanBright") */
+  /** Color for the active item indicator (default: selection accent) */
   activeColor?: string;
   /** Help text displayed at the bottom */
   helpText?: string;
@@ -64,8 +65,8 @@ const DropdownMenu = React.memo(function DropdownMenu({
   maxVisible = 8,
   width,
   title,
-  titleColor = "#229ac3",
-  activeColor = "cyanBright",
+  titleColor = theme.primary,
+  activeColor = theme.selection,
   helpText,
   emptyText = "No items found",
   renderItem,
@@ -106,19 +107,19 @@ const DropdownMenu = React.memo(function DropdownMenu({
             {title}
           </Text>
         ) : null}
-        <Text dimColor>{emptyText}</Text>
-        {helpText ? <Text dimColor>{helpText}</Text> : null}
+        <Text color={theme.muted}>{emptyText}</Text>
+        {helpText ? <Text color={theme.muted}>{helpText}</Text> : null}
       </Box>
     );
   }
 
   return (
-    <Box flexDirection="column" marginBottom={1} borderStyle={"round"} borderDimColor width={width}>
+    <Box flexDirection="column" marginBottom={1} borderStyle={"round"} borderColor={theme.border} width={width}>
       {/* Title */}
       {title ? (
         <Box
           borderStyle={"single"}
-          borderDimColor
+          borderColor={theme.border}
           borderBottom={true}
           borderRight={false}
           borderTop={false}
@@ -134,7 +135,7 @@ const DropdownMenu = React.memo(function DropdownMenu({
       {/* Scroll indicator - top */}
       {visibleStart > 0 ? (
         <Box marginLeft={2}>
-          <Text dimColor>… {visibleStart} above</Text>
+          <Text color={theme.muted}>… {visibleStart} above</Text>
         </Box>
       ) : null}
 
@@ -161,7 +162,9 @@ const DropdownMenu = React.memo(function DropdownMenu({
                   ) : null}
                 </Text>
               </Box>
-              <Box flexGrow={1}>{item.description ? <Text dimColor>{`${item.description}`}</Text> : null}</Box>
+              <Box flexGrow={1}>
+                {item.description ? <Text color={theme.muted}>{`${item.description}`}</Text> : null}
+              </Box>
             </Box>
           );
         })}
@@ -170,7 +173,7 @@ const DropdownMenu = React.memo(function DropdownMenu({
       {/* Scroll indicator - bottom */}
       {visibleStart + visibleItems.length < items.length ? (
         <Box marginLeft={2}>
-          <Text dimColor>… {items.length - visibleStart - visibleItems.length} more</Text>
+          <Text color={theme.muted}>… {items.length - visibleStart - visibleItems.length} more</Text>
         </Box>
       ) : null}
 
@@ -178,14 +181,14 @@ const DropdownMenu = React.memo(function DropdownMenu({
       {helpText ? (
         <Box
           borderStyle={"single"}
-          borderDimColor
+          borderColor={theme.border}
           borderBottom={false}
           borderRight={false}
           borderTop={true}
           borderLeft={false}
           paddingX={1}
         >
-          <Text dimColor>{helpText}</Text>
+          <Text color={theme.muted}>{helpText}</Text>
         </Box>
       ) : null}
     </Box>
