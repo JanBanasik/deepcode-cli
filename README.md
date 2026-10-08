@@ -1,32 +1,49 @@
-<div align="center">
-<br/>
-<br/>
-<p align="center">
-  <a href='https://deepcode.vegamo.cn/'>
-    <img src='https://avatars.githubusercontent.com/u/118287711?s=200&v=4' width='100' alt="deepcode-cli"/>
-  </a>
-</p>
-<h1>Deep Code CLI</h1>
+# JCode
 
-[![][npm-release-shield]][npm-release-link] [![][npm-downloads-shield]][npm-downloads-link] [![][github-contributors-shield]][github-contributors-link] [![][github-forks-shield]][github-forks-link] [![][github-stars-shield]][github-stars-link]
-[![][github-issues-shield]][github-issues-link] [![][github-issues-pr-shield]][github-issues-pr-link] [![][github-license-shield]][github-license-link]
+A personal fork of [Deep Code CLI](https://github.com/lessweb/deepcode-cli), with a SPECTRE terminal emblem, violet/cyan accents, and a compact session footer. DeepSeek configuration, native skills, permissions, and the existing prompt queue are preserved.
 
-[English](README-en.md) · 中文
+## Local installation
 
-<br/>
-</div>
-
-[Deep Code](https://github.com/lessweb/deepcode-cli) 是专为 `deepseek-v4` 模型优化的终端 AI 编码助手，支持深度思考、推理强度控制、Agent Skills 以及 MCP 集成。
-
-## 安装
+Requires Node.js 22 or newer and npm. From this checkout:
 
 ```bash
-npm install -g @vegamo/deepcode-cli
+npm ci
+npm run check
+npm test
+npm run build
+npm install --global --prefix "$HOME/.local/share/jcode" ./packages/cli --ignore-scripts
+export PATH="$HOME/.local/share/jcode/bin:$PATH"
+jcode --version
+jcode --help
 ```
 
-在任意项目目录下运行 `deepcode` 即可启动。
+Run `jcode` from any project directory. Add the `export PATH` line to your shell configuration if you want it available in future terminals. Rebuild after source changes; the local installation points to this checkout. To run without installing, use `npm start -- --help` or `node packages/cli/dist/cli.js` from this checkout.
 
-![intro2](resources/intro3.png)
+The separate install prefix exposes only `jcode` and lets an existing global `deepcode` installation remain available. Internal workspace package names stay unchanged, so use the dedicated prefix above. The CLI package is marked `private` and remains unpublished; it does not offer npm updates from the upstream release channel.
+
+## Shared settings and sessions
+
+JCode continues to use `~/.deepcode/settings.json`, project `.deepcode/settings.json`, `~/.deepcode/projects/`, and existing skill directories. Settings and sessions are shared with upstream Deep Code and its VSCode companion; model changes and session edits made in either CLI are visible to the other. There is no migration or API-key change. Existing `env.API_KEY`, `env.BASE_URL`, `DEEPCODE_*` environment overrides, model, and permission configuration still apply.
+
+## Appearance and session footer
+
+The terminal background and default foreground are preserved. Semantic colors are centralized in `packages/cli/src/ui/theme.ts`: violet (`#A78BFA`) for the main accent, cyan (`#22D3EE`) for secondary accents/selection, and separate success, warning, error, border, and muted tokens. `NO_COLOR=1 jcode`, `FORCE_COLOR=0 jcode`, and `TERM=dumb` disable colors; selection markers and permission descriptions remain readable.
+
+The footer always prioritizes the selected model and shows the Git branch inside a repository, including an unborn branch or `detached@<commit>`. Git refreshes asynchronously every 10 seconds and when a turn starts/finishes. Long fields are shortened and lower-priority fields omitted at narrow widths; existing custom status providers remain supported.
+
+`ctx(last)` uses the session's last API-reported token count and the configured context limit resolved by core. It is a snapshot, not an estimate of unsent prompts or newly appended tool output. Before reported usage exists it reads `ctx: n/a`. For custom models without an explicit valid `contextWindow`/`DEEPCODE_CONTEXT_WINDOW`, the generic core fallback is not presented as a known limit. Token abbreviations retain upstream's binary K/M units. Session cost is hidden because this checkout has no trustworthy pricing data.
+
+Terminal captures of the built CLI (the status/tool capture uses a local fixture endpoint, with no paid calls):
+
+![JCode at 120 columns](resources/jcode-120.png)
+
+[80 columns](resources/jcode-80.png) · [40 columns](resources/jcode-40.png) · [No color](resources/jcode-no-color.png) · [Model menu](resources/jcode-model-menu.png) · [Permission prompt](resources/jcode-permission.png) · [Tool output and context usage](resources/jcode-status.png)
+
+## Attribution
+
+Based on [lessweb/deepcode-cli](https://github.com/lessweb/deepcode-cli). The original MIT license and copyright notices are retained in [LICENSE](LICENSE). The SPECTRE octopus is a James Bond emblem; the terminal rendition follows the [reference reproduced by DPMA](https://www.dpma.de/dpma/veroeffentlichungen/hintergrund/dasallalles/jamesbond/index.html). JCode is an independent personal fork.
+
+The original Chinese usage documentation follows. [English usage documentation](README-en.md).
 
 ## 配置
 
@@ -175,11 +192,11 @@ Deep Code 支持 MCP（Model Context Protocol），可以连接 GitHub、浏览�
 
 ```bash
 # 克隆仓库
-git clone https://github.com/lessweb/deepcode-cli.git
+git clone https://github.com/JanBanasik/deepcode-cli.git
 cd deepcode-cli
 
 # 安装依赖
-npm install
+npm ci
 
 # 运行测试
 npm test
@@ -187,8 +204,9 @@ npm test
 # CLI本地开发（类型检查 + lint + 格式检查 + 构建）
 npm run build
 
-# CLI链接到全局（即本地全局安装）
-npm link
+# Install JCode separately from upstream
+npm install --global --prefix "$HOME/.local/share/jcode" ./packages/cli --ignore-scripts
+export PATH="$HOME/.local/share/jcode/bin:$PATH"
 
 # VSCode插件本地开发
 npm run build:vscode
@@ -200,7 +218,7 @@ npm run build:vscode
 
 ## 获取帮助
 
-- 在 GitHub Issues 上报告错误或请求功能 (https://github.com/lessweb/deepcode-cli/issues)
+- 在 GitHub Issues 上报告错误或请求功能 (https://github.com/JanBanasik/deepcode-cli/issues)
 
 ## 协议
 
