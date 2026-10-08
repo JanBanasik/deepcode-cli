@@ -1,6 +1,6 @@
 {
   "name": "@vegamo/deepcode-cli",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "JCode — personal Deep Code fork for DeepSeek in your terminal",
   "license": "MIT",
   "type": "module",
