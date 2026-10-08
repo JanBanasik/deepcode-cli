@@ -1,3 +1,4 @@
+import { theme } from "../theme";
 import React, { useMemo, useState } from "react";
 import { Box, Text } from "ink";
 import * as os from "node:os";
@@ -6,7 +7,7 @@ import type { SkillInfo } from "@vegamo/deepcode-core";
 import type { ResolvedDeepcodingSettings } from "@vegamo/deepcode-core";
 import { buildSlashCommands, BUILTIN_SLASH_COMMANDS, formatSlashCommandDescription } from "../core/slash-commands";
 import { ThemedGradient } from "./ThemedGradient";
-import { AsciiLogo } from "../ascii-art";
+import { AsciiLogo, CompactAsciiLogo } from "../ascii-art";
 import { useAppContext } from "../contexts";
 
 type WelcomeScreenProps = {
@@ -16,9 +17,6 @@ type WelcomeScreenProps = {
   width: number;
 };
 
-const TITLE_PANEL_WIDTH = 70;
-const PANEL_CONTENT_HEIGHT = 8;
-
 const SHORTCUT_TIPS = [
   { label: "Enter", description: "Send the prompt" },
   { label: "Shift+Enter", description: "Insert a newline" },
@@ -26,73 +24,71 @@ const SHORTCUT_TIPS = [
   { label: "Ctrl+R", description: "Open raw display mode selection" },
   { label: "Esc", description: "Interrupt the current model turn" },
   { label: "/", description: "Open the skills and commands menu" },
-  { label: "Ctrl+D twice", description: "Quit Deep Code CLI" },
+  { label: "Ctrl+D twice", description: "Quit JCode" },
 ];
 
 export function WelcomeScreen({ projectRoot, settings, skills, width }: WelcomeScreenProps): React.ReactElement {
   const { version } = useAppContext();
   const tips = useMemo(() => buildWelcomeTips(skills), [skills]);
   const [tipIndex] = useState(() => randomTipIndex(tips.length));
-  const compact = width < TITLE_PANEL_WIDTH + 42;
+  const compact = width < 76;
   const cwd = formatHomeRelativePath(projectRoot);
   const tip = tips[Math.min(tipIndex, Math.max(0, tips.length - 1))] ?? tips[0];
-  const panelWidth = compact ? undefined : Math.min(width, 72);
+  const panelWidth = Math.max(1, Math.min(width, 100));
 
   return (
-    <Box flexDirection="column" marginY={1}>
-      <Box flexDirection="column" width={panelWidth}>
-        <Box flexDirection="column" paddingX={1}>
-          <Box flexDirection="column" justifyContent="center" paddingX={1}>
-            <Box justifyContent="center" width={compact ? undefined : TITLE_PANEL_WIDTH}>
-              <ThemedGradient>{AsciiLogo}</ThemedGradient>
-            </Box>
+    <Box flexDirection="column" marginY={1} width={panelWidth}>
+      <Box flexDirection={compact ? "column" : "row"} gap={1}>
+        {width >= 25 ? (
+          <Box width={compact ? panelWidth : 33} justifyContent="center" alignItems="center">
+            <ThemedGradient>{compact ? CompactAsciiLogo : AsciiLogo}</ThemedGradient>
           </Box>
-
-          <Box
-            borderStyle={"round"}
-            borderColor={"#229ac3e6"}
-            flexDirection="column"
-            flexGrow={1}
-            height={compact ? undefined : PANEL_CONTENT_HEIGHT}
-            marginTop={compact ? 1 : 0}
-            paddingX={1}
-          >
-            <Box flexGrow={1} marginBottom={compact ? 1 : 0}>
-              <Text bold color={"#229ac3e6"}>
-                {">"}_ Deep Code{" "}
-              </Text>
-              <Text color="gray"> (v{version || "unknown"})</Text>
-            </Box>
-            {!compact ? <Text> </Text> : null}
-            <SettingRow label="Model" value={settings.model} />
-            <SettingRow label="Thinking Enabled" value={String(settings.thinkingEnabled)} />
-            <SettingRow label="Reasoning Effort" value={settings.thinkingEnabled ? settings.reasoningEffort : "-"} />
-            <SettingRow label="CWD" value={cwd} />
+        ) : null}
+        <Box
+          borderStyle="round"
+          borderColor={theme.border}
+          flexDirection="column"
+          flexGrow={1}
+          flexShrink={1}
+          paddingX={1}
+          justifyContent="center"
+        >
+          <Text bold color={theme.primary}>
+            JCode <Text color={theme.muted}>v{version || "unknown"}</Text>
+          </Text>
+          <Text color={theme.muted}>A personal fork of Deep Code</Text>
+          <Box marginTop={1} flexDirection="column">
+            <SettingRow label="Model" value={settings.model} width={width} />
+            <SettingRow
+              label="Thinking"
+              value={settings.thinkingEnabled ? settings.reasoningEffort : "off"}
+              width={width}
+            />
+            <SettingRow label="CWD" value={cwd} width={width} />
           </Box>
         </Box>
       </Box>
-
-      <Box flexDirection="column" width={panelWidth} paddingX={1}>
-        {tip ? (
-          <Box marginTop={1}>
-            <Text dimColor>
-              Tips: {tip.label} - {tip.description}
-            </Text>
-          </Box>
-        ) : null}
-      </Box>
+      {tip ? (
+        <Box marginTop={1}>
+          <Text color={theme.muted} wrap="truncate-end">
+            Tips: {tip.label} - {tip.description}
+          </Text>
+        </Box>
+      ) : null}
     </Box>
   );
 }
 
-function SettingRow({ label, value }: { label: string; value: string }): React.ReactElement {
+function SettingRow({ label, value, width }: { label: string; value: string; width: number }): React.ReactElement {
   return (
-    <Box flexDirection="row">
-      <Box width={20}>
-        <Text>{label}</Text>
+    <Box flexDirection={width < 35 ? "column" : "row"}>
+      <Box width={width < 35 ? undefined : 10} flexShrink={0}>
+        <Text color={theme.muted}>{label}</Text>
       </Box>
-      <Box flexGrow={1} justifyContent="flex-end">
-        <Text>{value}</Text>
+      <Box flexGrow={1} flexShrink={1}>
+        <Text color={theme.secondary} wrap="truncate-end">
+          {value}
+        </Text>
       </Box>
     </Box>
   );

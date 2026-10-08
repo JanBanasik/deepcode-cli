@@ -42,6 +42,9 @@ export interface ParsedCliArgs {
 }
 
 const EPILOG = [
+  "JCode is a personal fork of Deep Code (https://github.com/lessweb/deepcode-cli).",
+  "Settings and sessions are shared with upstream in ~/.deepcode; no migration is needed.",
+  "",
   "Configuration:",
   "  ~/.deepcode/settings.json    User-level API key, model, base URL",
   "  ./.deepcode/settings.json    Project-level settings",
@@ -80,9 +83,9 @@ async function configureYargs(argv?: string[]) {
   const rawArgv = argv ?? hideBin(process.argv);
   const yargsInstance = Yargs(rawArgv)
     .locale("en")
-    .scriptName("deepcode")
-    .usage("Usage: $0 [options] [command]\n\nDeep Code - Launch the interactive CLI or run one prompt with --exec")
-    .command("$0 [query..]", "Launch Deep Code CLI", (yargsInstance: Argv) =>
+    .scriptName("jcode")
+    .usage("Usage: $0 [options] [command]\n\nJCode - Launch the interactive CLI or run one prompt with --exec")
+    .command("$0 [query..]", "Launch JCode CLI", (yargsInstance: Argv) =>
       yargsInstance
         .option("prompt", {
           alias: "p",
@@ -154,12 +157,12 @@ async function configureYargs(argv?: string[]) {
           return true;
         })
     )
-    .example("deepcode", "Launch the interactive TUI in the current directory")
-    .example("deepcode -p <prompt>", "Launch the TUI and submit a prompt")
-    .example("deepcode -x -p <prompt>", "Run one prompt without launching the TUI")
-    .example("deepcode -r, --resume [sessionId]", "Resume a session or show session picker")
-    .example("deepcode -f, --fork [sessionId]", "Fork a session or the most recent session")
-    .example('cat error.log | deepcode -x -p "Explain this error"', "Use piped stdin as additional context")
+    .example("jcode", "Launch the interactive TUI in the current directory")
+    .example("jcode -p <prompt>", "Launch the TUI and submit a prompt")
+    .example("jcode -x -p <prompt>", "Run one prompt without launching the TUI")
+    .example("jcode -r, --resume [sessionId]", "Resume a session or show session picker")
+    .example("jcode -f, --fork [sessionId]", "Fork a session or the most recent session")
+    .example('cat error.log | jcode -x -p "Explain this error"', "Use piped stdin as additional context")
     .epilog(EPILOG)
     .strict()
     .demandCommand(0, 0)

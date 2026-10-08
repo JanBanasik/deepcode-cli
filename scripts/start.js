@@ -12,7 +12,7 @@ if (!existsSync(cliDist)) {
   process.exit(1);
 }
 
-console.log("Starting Deep Code CLI...\n");
+console.log("Starting JCode...\n");
 
 const child = spawn("node", [cliDist, ...process.argv.slice(2)], {
   stdio: "inherit",

@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { setShellIfWindows, getProjectCode } from "@vegamo/deepcode-core";
-import { checkForNpmUpdate, promptForPendingUpdate } from "./common/update-check";
 import { AppContainer } from "./ui";
 import { parseArguments } from "./cli-args";
 import { writeStderrLine, writeStdoutLine } from "./utils/stdio-helpers";
@@ -119,11 +118,7 @@ async function main(): Promise<void> {
     }
   }
 
-  const updatePromptResult = await promptForPendingUpdate(packageInfo);
-  if (updatePromptResult.installed) {
-    process.exit(0);
-  }
-
+  // This local fork has no npm release channel. Upstream updates would replace it.
   const restartRef: { current: (() => void) | null } = { current: null };
 
   function startApp(): void {
@@ -160,8 +155,6 @@ async function main(): Promise<void> {
       }
     });
   }
-
-  void checkForNpmUpdate(packageInfo);
 
   startApp();
 }

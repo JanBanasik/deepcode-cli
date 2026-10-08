@@ -100,7 +100,7 @@ test("buildExitSummaryText does not show resume hint when sessionId is provided"
   );
 
   assert.match(summary, /Goodbye!/);
-  assert.doesNotMatch(summary, /deepcode --resume 0a5cb7a5-c39d-4c39-a11b-05f8b22b8df6/);
+  assert.doesNotMatch(summary, /jcode --resume 0a5cb7a5-c39d-4c39-a11b-05f8b22b8df6/);
   assert.doesNotMatch(summary, /To continue this session/);
 });
 
@@ -112,7 +112,7 @@ test("buildExitSummaryText does not show resume hint when sessionId is omitted",
   );
 
   assert.match(summary, /Goodbye!/);
-  assert.doesNotMatch(summary, /deepcode --resume/);
+  assert.doesNotMatch(summary, /jcode --resume/);
   assert.doesNotMatch(summary, /To continue this session/);
 });
 
@@ -125,14 +125,14 @@ test("buildExitSummaryText does not show resume hint with null session", () => {
   );
 
   assert.match(summary, /Goodbye!/);
-  assert.doesNotMatch(summary, /deepcode --resume test-session-id/);
+  assert.doesNotMatch(summary, /jcode --resume test-session-id/);
   assert.doesNotMatch(summary, /To continue this session/);
 });
 
 test("buildResumeHintText shows resume command when sessionId is provided", () => {
   const hint = stripAnsi(buildResumeHintText("0a5cb7a5-c39d-4c39-a11b-05f8b22b8df6") ?? "");
 
-  assert.equal(hint, "To continue this session, run deepcode --resume 0a5cb7a5-c39d-4c39-a11b-05f8b22b8df6");
+  assert.equal(hint, "To continue this session, run jcode --resume 0a5cb7a5-c39d-4c39-a11b-05f8b22b8df6");
 });
 
 test("buildResumeHintText returns null when sessionId is omitted", () => {

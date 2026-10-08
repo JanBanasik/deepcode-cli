@@ -1,5 +1,4 @@
-import chalk from "chalk";
-import gradientString from "gradient-string";
+import { chalk, themeText } from "./theme";
 import type { ModelUsage, SessionEntry } from "@vegamo/deepcode-core";
 
 type ExitSummaryInput = {
@@ -74,7 +73,7 @@ export function buildExitSummaryText(input: ExitSummaryInput): string {
   const contentWidth = innerWidth - 4; // "│  " prefix + "  │" suffix → 4 chars padding
 
   const borderColor = chalk.dim;
-  const titleColor = gradientString("#229ac3e6", "rgb(125 51 247 / 0.7)");
+  const titleColor = themeText.primary;
   const line = (text: string) => `${borderColor("│")}  ${padRight(text, contentWidth)}  ${borderColor("│")}`;
 
   const header = chalk.bold(titleColor("Goodbye!"));
@@ -114,7 +113,7 @@ export function buildExitSummaryText(input: ExitSummaryInput): string {
       padLeft("Output Tokens", colOutput) +
       padLeft("Cached Tokens", colCached);
     rows.push(chalk.bold(headerRow));
-    rows.push(chalk.gray(divider));
+    rows.push(themeText.muted(divider));
 
     for (const { modelName, usage } of usageRows) {
       const reqsStr = formatNumber(usage.totalReqs).padStart(colReqs);
@@ -124,9 +123,9 @@ export function buildExitSummaryText(input: ExitSummaryInput): string {
       const dataRow =
         padRight(modelName, colModel) +
         padRight(reqsStr, colReqs) +
-        padRight(chalk.yellow(inputStr), colInput) +
-        padRight(chalk.yellow(outputStr), colOutput) +
-        padRight(chalk.yellow(cachedStr), colCached);
+        padRight(themeText.secondary(inputStr), colInput) +
+        padRight(themeText.secondary(outputStr), colOutput) +
+        padRight(themeText.secondary(cachedStr), colCached);
       rows.push(dataRow);
     }
 
@@ -148,7 +147,7 @@ export function buildResumeHintText(sessionId?: string): string | null {
   if (!sessionId) {
     return null;
   }
-  return chalk.dim(`To continue this session, run `) + chalk.hex("#229ac3")(`deepcode --resume ${sessionId}`);
+  return chalk.dim(`To continue this session, run `) + themeText.primary(`jcode --resume ${sessionId}`);
 }
 
 export function buildPluginRateLimitHintText(session: SessionEntry | null): string | null {
@@ -158,7 +157,7 @@ export function buildPluginRateLimitHintText(session: SessionEntry | null): stri
   }
   return (
     chalk.dim(`This conversation just exceeded the ${tool} tool rate limit. Visit `) +
-    chalk.hex("#229ac3")("https://deepcode.vegamo.cn/plus/packages") +
+    themeText.primary("https://deepcode.vegamo.cn/plus/packages") +
     chalk.dim(" for more details.")
   );
 }
