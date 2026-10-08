@@ -1,4 +1,4 @@
-# Deep Code 配置
+# JCode 配置
 
 ## 配置层级
 
@@ -13,12 +13,12 @@
 
 ## 设置文件
 
-Deep Code 使用 `settings.json` 设置文件进行持久化配置，支持两个层级的存放位置：
+JCode 使用 `settings.json` 设置文件进行持久化配置，支持两个层级的存放位置：
 
 | 文件类型     | 位置                                 | 作用范围                                              |
 | ------------ | ---------------------------------- | ---------------------------------------------------- |
-| 用户设置文件 | `~/.deepcode/settings.json`         | 适用于当前用户的所有 Deep Code 会话。                      |
-| 项目设置文件 | `项目根目录/.deepcode/settings.json` | 仅在该特定项目中运行 Deep Code 时生效。项目设置会覆盖用户设置。 |
+| 用户设置文件 | `~/.deepcode/settings.json`         | 适用于当前用户的所有 JCode 会话。                      |
+| 项目设置文件 | `项目根目录/.deepcode/settings.json` | 仅在该特定项目中运行 JCode 时生效。项目设置会覆盖用户设置。 |
 
 ### `settings.json` 中的可用设置
 
@@ -37,7 +37,7 @@ Deep Code 使用 `settings.json` 设置文件进行持久化配置，支持两�
 | `filesApiTimeoutMs`  | number    | 单张图片 Files API 处理超时，默认 `60000`，最大 `600000` 毫秒              |
 | `fileExpiresAfterSeconds` | number | 远端文件有效期，默认 `604800` 秒                                      |
 | `fileRefreshMarginSeconds` | number | 剩余有效期低于该值时刷新缓存，默认 `3600` 秒                         |
-| `fileQuotaCleanupBatch` | number | 配额不足时清理的最旧 Deep Code 文件数，默认 `100`                         |
+| `fileQuotaCleanupBatch` | number | 配额不足时清理的最旧 JCode 文件数，默认 `100`                         |
 | `maxRequestFilesBytes` | number | 单次请求内图片原始字节总上限，默认 `134217728`（128 MiB）                    |
 | `debugLogEnabled`    | boolean   | 是否启用调试日志输出（默认 `false`）                                 |
 | `telemetryEnabled`   | boolean   | 是否启用匿名使用数据上报（默认 `true`）                              |
@@ -108,7 +108,7 @@ Deep Code 使用 `settings.json` 设置文件进行持久化配置，支持两�
 
 #### DeepSeek Files API
 
-当 `BASE_URL` 为 `https://api.deepseek.com` 时，设置 `filesApiEnabled: true` 后，Deep Code 会将图片上传到固定的 `https://api.deepseek.com/files`，并在聊天请求中使用 `file_id`。其他 API 地址不会启用该功能。上传或缓存刷新失败时，本次请求直接失败；关闭开关时图片处理逻辑保持不变。
+当 `BASE_URL` 为 `https://api.deepseek.com` 时，设置 `filesApiEnabled: true` 后，JCode 会将图片上传到固定的 `https://api.deepseek.com/files`，并在聊天请求中使用 `file_id`。其他 API 地址不会启用该功能。上传或缓存刷新失败时，本次请求直接失败；关闭开关时图片处理逻辑保持不变。
 
 ```json
 {
@@ -147,7 +147,7 @@ Deep Code 使用 `settings.json` 设置文件进行持久化配置，支持两�
 
 #### `webSearchTool` — 自定义联网搜索
 
-Deep Code 内置免费可用的 Web Search 工具。如果需要自定义搜索逻辑，可将 `webSearchTool` 设为一个可执行脚本的完整路径：
+JCode 内置免费可用的 Web Search 工具。如果需要自定义搜索逻辑，可将 `webSearchTool` 设为一个可执行脚本的完整路径：
 
 ```json
 {
@@ -198,7 +198,7 @@ MCP（Model Context Protocol）服务器配置。值是键值对，键为服务�
 | `args`               | string[] | 否   | 传递给命令的参数列表                                                  |
 | `env`                | object   | 否   | 传递给 MCP 服务器进程的环境变量                                       |
 
-> 当 `command` 为 `npx` 时，Deep Code 会自动在参数前补充 `-y`。
+> 当 `command` 为 `npx` 时，JCode 会自动在参数前补充 `-y`。
 
 详细 MCP 使用说明请参考 [mcp.md](mcp.md)。
 
@@ -214,7 +214,7 @@ MCP（Model Context Protocol）服务器配置。值是键值对，键为服务�
 也可以通过环境变量关闭：
 
 ```bash
-DEEPCODE_TELEMETRY_ENABLED=0 deepcode
+DEEPCODE_TELEMETRY_ENABLED=0 jcode
 ```
 
 ## 环境变量优先级
@@ -239,7 +239,7 @@ DEEPCODE_TELEMETRY_ENABLED=0 deepcode
 1. 硬编码默认值: `""`
 2. 用户级settings.json: `{"env": {"API_KEY": "abc123"}}`
 3. 项目级settings.json: `{"env": {"API_KEY": "abc123"}}`
-4. 系统环境变量: `DEEPCODE_API_KEY=abc123 deepcode`
+4. 系统环境变量: `DEEPCODE_API_KEY=abc123 jcode`
 
 #### 二、设置模型的model, thinkingEnabled, reasoningEffort
 
@@ -250,7 +250,7 @@ DEEPCODE_TELEMETRY_ENABLED=0 deepcode
 3. 用户级settings.json: `{"thinkingEnabled": true}`
 4. 项目级settings.json: `{"env": {"THINKING_ENABLED": "true"}}`
 5. 项目级settings.json: `{"thinkingEnabled": true}`
-6. 系统环境变量: `DEEPCODE_THINKING_ENABLED=true deepcode`
+6. 系统环境变量: `DEEPCODE_THINKING_ENABLED=true jcode`
 
 #### 三、设置启动notify, webSearchTool等外挂脚本的环境变量
 
@@ -259,7 +259,7 @@ DEEPCODE_TELEMETRY_ENABLED=0 deepcode
 1. 硬编码默认值：`os.environ.get('WEBHOOK', '...')  # notify脚本代码`
 2. 用户级settings.json: `{"env": {"WEBHOOK": "..."}}`
 3. 项目级settings.json: `{"env": {"WEBHOOK": "true"}}`
-4. 系统环境变量: `DEEPCODE_WEBHOOK=... deepcode`
+4. 系统环境变量: `DEEPCODE_WEBHOOK=... jcode`
 
 #### 四、设置MCP Service的环境变量
 
@@ -269,7 +269,7 @@ DEEPCODE_TELEMETRY_ENABLED=0 deepcode
 2. 用户级settings.json: `{"env": {"MCP_GITHUB_PERSONAL_ACCESS_TOKEN": "..."}}`
 3. 项目级settings.json: `{"mcpServers":{"github":{"env":{"GITHUB_PERSONAL_ACCESS_TOKEN":"..."}}}}`
 4. 项目级settings.json: `{"env": {"MCP_GITHUB_PERSONAL_ACCESS_TOKEN": "..."}}`
-5. 系统环境变量: `DEEPCODE_MCP_GITHUB_PERSONAL_ACCESS_TOKEN=... deepcode`
+5. 系统环境变量: `DEEPCODE_MCP_GITHUB_PERSONAL_ACCESS_TOKEN=... jcode`
 
 ## DeepCode PLUS 订阅与 LLM 通道
 

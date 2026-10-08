@@ -1,6 +1,6 @@
 # Status Line Plugins
 
-Deep Code CLI lets you inject custom information into the status line at the bottom of the terminal (Git branch, current time, token usage, etc.) through plugins, without modifying the CLI source. The status line renders below the keyboard hint line under the prompt input, and all provider outputs are concatenated with a separator.
+JCode lets you inject custom information into the status line at the bottom of the terminal (Git branch, current time, token usage, etc.) through plugins, without modifying the CLI source. The status line renders below the keyboard hint line under the prompt input, and all provider outputs are concatenated with a separator.
 
 ## Configuration
 

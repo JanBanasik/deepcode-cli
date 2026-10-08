@@ -1,41 +1,56 @@
-<div align="center">
-<br/>
-<br/>
-<p align="center">
-  <a href='https://deepcode.vegamo.cn/'>
-    <img src='https://avatars.githubusercontent.com/u/118287711?s=200&v=4' width='100' alt="deepcode-cli"/>
-  </a>
-</p>
-<h1>Deep Code CLI</h1>
+# JCode
 
-[![][npm-release-shield]][npm-release-link] [![][npm-downloads-shield]][npm-downloads-link] [![][github-contributors-shield]][github-contributors-link] [![][github-forks-shield]][github-forks-link] [![][github-stars-shield]][github-stars-link]
-[![][github-issues-shield]][github-issues-link] [![][github-issues-pr-shield]][github-issues-pr-link] [![][github-license-shield]][github-license-link]
+A personal fork of [Deep Code CLI](https://github.com/lessweb/deepcode-cli), with a SPECTRE terminal emblem, violet/cyan accents, and a compact session footer. DeepSeek configuration, native skills, permissions, and the existing prompt queue are preserved.
 
-[English](README-en.md) · 中文
+## Local installation
 
-<br/>
-</div>
-
-[Deep Code](https://github.com/lessweb/deepcode-cli) 是专为 `deepseek-v4` 模型优化的终端 AI 编码助手，支持深度思考、推理强度控制、Agent Skills 以及 MCP 集成。
-
-## 安装
+Requires Node.js 22 or newer and npm. From this checkout:
 
 ```bash
-npm install -g @vegamo/deepcode-cli
+npm ci
+npm run check
+npm test
+npm run build
+npm install --global --prefix "$HOME/.local/share/jcode" ./packages/cli --ignore-scripts
+export PATH="$HOME/.local/share/jcode/bin:$PATH"
+jcode --version
+jcode --help
 ```
 
-在任意项目目录下运行 `deepcode` 即可启动。
+Run `jcode` from any project directory. Add the `export PATH` line to your shell configuration if you want it available in future terminals. Rebuild after source changes; the local installation points to this checkout. To run without installing, use `npm start -- --help` or `node packages/cli/dist/cli.js` from this checkout.
 
-![intro2](resources/intro3.png)
+The separate install prefix exposes only `jcode` and lets an existing global `deepcode` installation remain available. Internal workspace package names stay unchanged, so use the dedicated prefix above. The CLI package is marked `private` and remains unpublished; it does not offer npm updates from the upstream release channel.
 
-## 配置
+## Shared settings and sessions
 
-创建 `~/.deepcode/settings.json` 文件，内容如下：
+JCode continues to use `~/.deepcode/settings.json`, project `.deepcode/settings.json`, `~/.deepcode/projects/`, and existing skill directories. Settings and sessions are shared with upstream JCode and its VSCode companion; model changes and session edits made in either CLI are visible to the other. There is no migration or API-key change. Internal workspace packages, VSCode command IDs, and the `deepcode-self-refer` skill identifier retain their upstream names to preserve imports and existing settings. Existing `env.API_KEY`, `env.BASE_URL`, `DEEPCODE_*` environment overrides, model, and permission configuration still apply.
+
+## Appearance and session footer
+
+The terminal background and default foreground are preserved. Semantic colors are centralized in `packages/cli/src/ui/theme.ts`: violet (`#A78BFA`) for the main accent, cyan (`#22D3EE`) for secondary accents/selection, and separate success, warning, error, border, and muted tokens. `NO_COLOR=1 jcode`, `FORCE_COLOR=0 jcode`, and `TERM=dumb` disable colors; selection markers and permission descriptions remain readable.
+
+The footer always prioritizes the selected model and shows the Git branch inside a repository, including an unborn branch or `detached@<commit>`. Git refreshes asynchronously every 10 seconds and when a turn starts/finishes. Long fields are shortened and lower-priority fields omitted at narrow widths; existing custom status providers remain supported.
+
+`ctx(last)` uses the session's last API-reported token count and the configured context limit resolved by core. It is a snapshot, not an estimate of unsent prompts or newly appended tool output. Before reported usage exists it reads `ctx: n/a`. For custom models without an explicit valid `contextWindow`/`DEEPCODE_CONTEXT_WINDOW`, the generic core fallback is not presented as a known limit. Token abbreviations retain upstream's binary K/M units. Session cost is hidden because this checkout has no trustworthy pricing data.
+
+Terminal captures of the built CLI (the status/tool capture uses a local fixture endpoint, with no paid calls):
+
+![JCode at 120 columns](https://raw.githubusercontent.com/JanBanasik/deepcode-cli/main/resources/jcode-120.png)
+
+[80 columns](https://raw.githubusercontent.com/JanBanasik/deepcode-cli/main/resources/jcode-80.png) · [40 columns](https://raw.githubusercontent.com/JanBanasik/deepcode-cli/main/resources/jcode-40.png) · [No color](https://raw.githubusercontent.com/JanBanasik/deepcode-cli/main/resources/jcode-no-color.png) · [Model menu](https://raw.githubusercontent.com/JanBanasik/deepcode-cli/main/resources/jcode-model-menu.png) · [Permission prompt](https://raw.githubusercontent.com/JanBanasik/deepcode-cli/main/resources/jcode-permission.png) · [Tool output and context usage](https://raw.githubusercontent.com/JanBanasik/deepcode-cli/main/resources/jcode-status.png)
+
+## Attribution
+
+Based on [upstream Deep Code](https://github.com/lessweb/deepcode-cli). The original MIT license and copyright notices are retained in [LICENSE](https://github.com/JanBanasik/deepcode-cli/blob/main/LICENSE). The SPECTRE octopus is a James Bond emblem; the terminal rendition follows the [reference reproduced by DPMA](https://www.dpma.de/dpma/veroeffentlichungen/hintergrund/dasallalles/jamesbond/index.html). JCode is an independent personal fork.
+
+## Configuration
+
+Create `~/.deepcode/settings.json`:
 
 ```json
 {
   "env": {
-    "MODEL": "deepseek-v4-pro",
+    "MODEL": "deepseek-flash",
     "BASE_URL": "https://api.deepseek.com",
     "API_KEY": "sk-..."
   },
@@ -44,105 +59,107 @@ npm install -g @vegamo/deepcode-cli
 }
 ```
 
-配置文件与 [Deep Code VSCode 插件](https://github.com/lessweb/deepcode-cli) 共享，无需重复配置。
+The configuration file is shared with the [upstream Deep Code VSCode extension](https://github.com/lessweb/deepcode-cli) — configure once, use everywhere.
 
-完整配置说明（多层级优先级、环境变量等）请参阅 [docs/configuration.md](docs/configuration.md)。
+For complete configuration details (multi-level priority, environment variables, etc.), see [docs/configuration.md](configuration.md).
 
-## 主要功能
+## Key Features
 
 ### **Skills**
+JCode supports agent skills that allow you to extend the assistant's capabilities:
 
-Deep Code CLI 支持 agent skills，允许您扩展助手的能力：
+Skills are discovered from these locations, in priority order:
 
-Skills 会按以下优先级扫描：
+| Scope   | Path                  | Purpose                       |
+| :------ | :-------------------- | :---------------------------- |
+| Project | `./.deepcode/skills/` | Shared legacy location   |
+| Project | `./.agents/skills/`   | Cross-client interoperability |
+| User    | `~/.deepcode/skills/` | Shared legacy location   |
+| User    | `~/.agents/skills/`   | Cross-client interoperability |
 
-| Scope   | Path                       | Purpose                           |
-| :------ | :------------------------- | :-------------------------------- |
-| Project | `./.deepcode/skills/`      | Deep Code 原生位置，最高优先级    |
-| Project | `./.agents/skills/`        | 跨客户端互操作                    |
-| User    | `~/.deepcode/skills/`      | Deep Code 原生位置                |
-| User    | `~/.agents/skills/`        | 跨客户端互操作                    |
-| Bundled | `bundled:<skill>/SKILL.md` | Deep Code 内置 skills，最低优先级 |
+### **Optimized for DeepSeek**
+- Specifically tuned for DeepSeek model performance.
+- Reduce costs by using [Context Caching](https://api-docs.deepseek.com/guides/kv_cache).
+- Natively supports [Thinking Mode](https://api-docs.deepseek.com/guides/thinking_mode) and Effort Control.
 
-### **为 DeepSeek 优化**
+## Slash Commands & Keyboard Shortcuts
 
-- 专门为 DeepSeek 模型性能调优。
-- 通过使用[上下文缓存](https://api-docs.deepseek.com/guides/kv_cache)来降低成本。
-- 原生支持[思考模式](https://api-docs.deepseek.com/guides/thinking_mode)和思考强度控制。
+| Slash Command    | Action                                                  |
+|------------------|---------------------------------------------------------|
+| `/`              | Open the skills / commands menu                         |
+| `/new`           | Start a fresh conversation                              |
+| `/resume`        | Choose a previous conversation to continue              |
+| `/fork`          | Fork the current conversation     |
+| `/continue`      | Continue the active conversation or pick one to resume  |
+| `/model`         | Switch model, thinking mode, and reasoning effort       |
+| `/raw`           | Toggle display mode (Normal / Lite / Raw scrollback)    |
+| `/init`          | Initialize an AGENTS.md file (LLM project instructions) |
+| `/skills`        | List available skills                                   |
+| `/mcp`           | View MCP server status and available tools              |
+| `/undo`          | Restore code and/or conversation to a previous point    |
+| `/exit`          | Quit (also `Ctrl+D` twice)                              |
 
-## 斜杠命令与按键功能
+| Key              | Action                                                   |
+|------------------|----------------------------------------------------------|
+| `Enter`          | Send the prompt                                          |
+| `Shift+Enter`    | Insert a newline (also `Ctrl+J`)                         |
+| `Ctrl+V`         | Paste an image from the clipboard                        |
+| `Esc`            | Interrupt the current model turn                         |
+| `Ctrl+D` twice   | Quit JCode                                           |
 
-| 斜杠命令    | 操作                                         |
-| ----------- | -------------------------------------------- |
-| `/`         | 打开 skills / 命令菜单                       |
-| `/new`      | 开始新对话                                   |
-| `/resume`   | 选择历史对话继续                             |
-| `/continue` | 继续当前对话，或选择历史对话恢复             |
-| `/model`    | 切换模型、思考模式和推理强度                 |
-| `/raw`      | 切换显示模式（Normal / Lite / Raw 滚动回溯） |
-| `/init`     | 初始化 AGENTS.md 文件                        |
-| `/skills`   | 列出可用 skills                              |
-| `/mcp`      | 查看 MCP 服务器状态和可用工具                |
-| `/undo`     | 将代码和/或对话恢复到之前的状态              |
-| `/exit`     | 退出（也可用连续 `Ctrl+D`）                  |
+### Queued prompts
 
-| 按键          | 操作                        |
-| ------------- | --------------------------- |
-| `Enter`       | 发送消息                    |
-| `Shift+Enter` | 插入换行（也可用 `Ctrl+J`） |
-| `Ctrl+V`      | 从剪贴板粘贴图片            |
-| `Esc`         | 中断当前模型回复            |
-| 连续 `Ctrl+D` | 退出                        |
+While the assistant is working, press `Enter` to queue a follow-up prompt. Prompts run one at a time in submission order, after the active turn finishes. The input stays editable with a visible cursor, and the queue shows its count plus up to three numbered, one-line previews. Image-only and skill-only prompts also have descriptive previews.
 
-## 支持的模型
+Press `Esc` to interrupt the active turn and discard every waiting prompt. A new prompt intentionally submitted after `Esc` waits for the interrupted run to settle and then executes. Slash commands remain blocked while busy, except `/exit`, which exits immediately and discards the queue. Pending prompts are kept in memory for the current CLI instance.
 
+![Queued prompt previews in the CLI, rendered with sample prompts](https://raw.githubusercontent.com/JanBanasik/deepcode-cli/main/resources/prompt-queue.png)
+
+## Supported Models
+
+- `deepseek-flash` (Recommended)
 - `deepseek-v4-pro`
-- `deepseek-v4-flash`（推荐使用）
+- `deepseek-v4-flash`
 - `deepseek-v4-flash-vision-exp`
-- `deepseek-flash`（DeepSeek-V4.1-Flash，支持原生图片输入、思考模式和 1M 上下文）
-- 任何其他 OpenAI 兼容模型
+- Any other OpenAI-compatible model
 
-## 常见问题
+## Architecture and Benchmarks
 
-### Deep Code 是否有 VSCode 插件？
+In ["Better Models: Worse Tools"](https://lucumr.pocoo.org/2026/7/4/better-models-worse-tools/), Armin Ronacher argues that tool schemas are not "neutral": models (LLMs) inherit tool-use habits formed during training and reinforcement learning, so they may perform well in one mainstream harness but become unstable with a different tool shape. This is the architectural starting point for JCode: it is tuned specifically for DeepSeek, so the harness itself can stay aligned with DeepSeek's behavior.
 
-有的。Deep Code 提供功能完整的 VSCode 插件，可在 [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=vegamo.deepcode-vscode) 安装。插件与 CLI 共享 `~/.deepcode/settings.json` 配置文件，可以在终端和编辑器之间无缝切换。
+Upstream Deep Code's gains come from the combined effect of tool constraints, context management, Agent Skills, permission policy, and other architectural decisions. The [deepcode-qrcode-benchmark](https://github.com/qorzj/deepcode-qrcode-benchmark) project shows that on a real and challenging Python requirement, Deep Code + DeepSeek + `/plan` mode has an effectiveness advantage over Claude Code + DeepSeek.
 
-### Deep Code 是否支持理解图片？
+> See also: [JCode Architecture](https://github.com/JanBanasik/deepcode-cli/blob/main/docs/architecture_en.md)
 
-支持。`deepseek-flash` 和 `deepseek-v4-flash-vision-exp` 模型支持直接读取本地图片或使用`ctrl+v`从剪贴板粘贴图片，让模型直接看到图片内容。
+## FAQ
 
-`deepseek-v4-pro`、`deepseek-v4-flash` 等非多模态模型仍会使用 `UnderstandImage` 识图工具。Deep Code 会自动判断模型能力，也可通过 `multimodal` 配置项手动覆盖。
+### Does JCode support subagents?
 
-默认情况下，图片会以 base64 内联发送给模型。启用 `filesApiEnabled` 后，Deep Code 会使用 DeepSeek Files API 上传图片并在请求中复用 `file_id`。
+JCode does not yet launch or supervise native subagents. Agent Skills provide reusable instructions, MCP connects external tools, and `/fork` branches a conversation. Background Bash jobs are shell processes; built-in tool calls currently run sequentially. Native subagent support is tracked in [issue #9](https://github.com/JanBanasik/deepcode-cli/issues/9).
 
-### 怎样在任务完成后自动给 Slack 发消息？
+### Does JCode have a VSCode companion?
 
-编写一个调用 Slack webhook 的 Shell 通知脚本，然后在 `~/.deepcode/settings.json` 中将 `notify` 字段设为该脚本的完整路径即可。详细步骤请参考 [docs/notify.md](docs/notify.md)。
+This checkout includes the JCode VSCode companion. It also remains compatible with the published [upstream Deep Code extension](https://marketplace.visualstudio.com/items?itemName=vegamo.deepcode-vscode). Both share `~/.deepcode/settings.json` with the CLI. JCode has no separate Marketplace release.
 
-### 怎样启用联网搜索功能？
+### Does JCode support understanding images?
 
-Deep Code自带免费的、且大部分情况够用的Web Search工具。如果你希望使用自定义脚本进行联网搜索，可以在 `~/.deepcode/settings.json` 中将 `webSearchTool` 设为脚本的完整路径即可。详细步骤可参考：https://github.com/qorzj/web_search_cli
+Yes. The `deepseek-flash` model can read local images directly, or you can paste images from the clipboard with `Ctrl+V`, so the model can see the image content directly.
 
-### 如何配置 MCP？
+Non-multimodal models such as `deepseek-v4-pro` and `deepseek-v4-flash` continue to use the `UnderstandImage` image-understanding tool. JCode detects model capabilities automatically; you can also override the detection with the `multimodal` setting.
 
-Deep Code 支持 MCP（Model Context Protocol），可以连接 GitHub、浏览器、数据库等外部服务。在 `settings.json` 中配置 `mcpServers` 字段即可启用，启动后使用 `/mcp` 命令查看已配置的 MCP 服务器状态和可用工具。
+By default, images are sent inline as base64. With `filesApiEnabled`, JCode uploads images through the DeepSeek Files API and reuses the `file_id` in subsequent requests. See [docs/configuration_en.md](configuration_en.md#deepseek-files-api).
 
-详细配置指南：[docs/mcp.md](docs/mcp.md)
+### How to automatically send a Slack message after a task completes?
 
-### 如何配置 Deep Code 任务完成后发送通知？
+Write a shell notification script that calls a Slack webhook, then set the `notify` field in `~/.deepcode/settings.json` to the full path of the script. For detailed steps, see [docs/notify_en.md](notify_en.md).
 
-当 AI 助手完成一轮任务后，Deep Code 可以自动执行一个通知脚本，将任务结果发送到你指定的渠道（如 Slack、系统通知等）。
+### How do I enable web search?
 
-详细配置指南：[docs/notify.md](docs/notify.md)
+JCode comes with a built-in, free Web Search tool that works well for most use cases. If you prefer to use a custom script for web search, set the `webSearchTool` field in `~/.deepcode/settings.json` to the full path of your script. For detailed steps, refer to: https://github.com/qorzj/web_search_cli
 
-### Deep Code 只支持 YOLO 模式吗？
+### Does it support Coding Plan?
 
-不是。Deep Code 内置了细粒度的权限控制机制，支持在 AI 助手执行 Shell 命令、读写文件、访问网络等操作前进行确认。你可以通过 `settings.json` 中的 `permissions` 字段按需配置每种权限范围的策略：始终允许、始终询问、或直接拒绝。详见 [docs/permission.md](docs/permission.md)。
-
-### 是否支持 Coding Plan？
-
-支持。只要把 `~/.deepcode/settings.json` 的 `env.BASE_URL` 配置为 OpenAI 兼容的接口地址就行。以火山方舟的 Coding Plan 为例：
+Yes. Just set `env.BASE_URL` in `~/.deepcode/settings.json` to an OpenAI-compatible API endpoint. Take Volcano Ark's Coding Plan as an example:
 
 ```json
 {
@@ -155,62 +172,60 @@ Deep Code 支持 MCP（Model Context Protocol），可以连接 GitHub、浏览�
 }
 ```
 
-## 贡献
+### How do I configure MCP?
 
-欢迎贡献代码！以下是参与方式：
+JCode supports MCP (Model Context Protocol) to connect external services such as GitHub, browsers, databases, and more. Configure the `mcpServers` field in `settings.json` to enable it, then use the `/mcp` command to view MCP server status and available tools.
+
+For detailed setup instructions, see: [docs/mcp.md](mcp.md)
+
+### How to configure JCode to send notifications after a task completes?
+
+When the AI assistant completes a task, JCode can automatically execute a notification script to send the task results to the specified channel (e.g., Slack, system notifications, etc.).
+
+For detailed configuration instructions, see: [docs/notify_en.md](notify_en.md)
+
+### Does JCode only support YOLO mode?
+
+No. JCode has a built-in fine-grained permission control mechanism that lets you confirm operations before the AI assistant executes shell commands, reads/writes files, accesses the network, and more. You can configure each permission scope's policy — always allow, always ask, or deny — via the `permissions` field in `settings.json`. See [docs/permission.md](permission.md) for details.
+
+## Contributing
+
+Contributions are welcome! Here's how to get started:
 
 ```bash
-# 克隆仓库
-git clone https://github.com/lessweb/deepcode-cli.git
-cd deepcode-cli
+# Clone the repository
+git clone https://github.com/JanBanasik/deepcode-cli.git JCode
+cd JCode
 
-# 安装依赖
-npm install
+# Install dependencies
+npm ci
 
-# 本地开发（类型检查 + lint + 格式检查 + 构建）
+# Local development (typecheck + lint + format check + bundle)
 npm run build
 
-# 运行测试
+# Run tests
 npm test
 
-# 链接到全局（即本地全局安装）
-npm link
+# Install the fork separately from upstream
+npm install --global --prefix "$HOME/.local/share/jcode" ./packages/cli --ignore-scripts
+export PATH="$HOME/.local/share/jcode/bin:$PATH"
 ```
 
-- 提交 PR 前请确保 `npm run check` 通过（类型检查 + lint + 格式检查）
-- 建议在执行构建前，先执行 `npm run format` 自动格式化代码，避免构建报错
+- Make sure `npm run check` passes before submitting a PR (typecheck + lint + format check)
+- We recommend running `npm run format` before building to avoid errors
 
-## 获取帮助
+## Getting Help
 
-- 在 GitHub Issues 上报告错误或请求功能 (https://github.com/lessweb/deepcode-cli/issues)
+- Report bugs or request features on GitHub Issues (https://github.com/JanBanasik/deepcode-cli/issues)
 
-## 协议
+## License
 
 - MIT
 
-## 支持我们
+## Support Us
 
-如果你觉得这个工具对你有帮助，请考虑通过以下方式支持我们：
+If you find this tool helpful, please consider supporting us by:
 
-- 在 GitHub 上给我们一个 Star (https://github.com/lessweb/deepcode-cli)
-- 向我们提交反馈和建议
-- 分享给你的朋友和同事
-
-<!-- LINK GROUP -->
-
-[npm-release-link]: https://www.npmjs.com/package/@vegamo/deepcode-cli
-[npm-release-shield]: https://img.shields.io/npm/v/@vegamo/deepcode-cli?color=4d6BFE&labelColor=black&logo=npm&logoColor=white&style=flat-square&cacheSeconds=1800
-[npm-downloads-link]: https://www.npmjs.com/package/@vegamo/deepcode-cli
-[npm-downloads-shield]: https://img.shields.io/npm/dt/@vegamo/deepcode-cli?labelColor=black&style=flat-square&color=4d6BFE&cacheSeconds=1800
-[github-contributors-link]: https://github.com/lessweb/deepcode-cli/graphs/contributors
-[github-contributors-shield]: https://img.shields.io/github/contributors/lessweb/deepcode-cli?color=4d6BFE&labelColor=black&style=flat-square&cacheSeconds=1800
-[github-forks-link]: https://github.com/lessweb/deepcode-cli/network/members
-[github-forks-shield]: https://img.shields.io/github/forks/lessweb/deepcode-cli?color=4d6BFE&labelColor=black&style=flat-square&cacheSeconds=1800
-[github-stars-link]: https://github.com/lessweb/deepcode-cli/network/stargazers
-[github-stars-shield]: https://img.shields.io/github/stars/lessweb/deepcode-cli?color=4d6BFE&labelColor=black&style=flat-square&cacheSeconds=1800
-[github-issues-link]: https://github.com/lessweb/deepcode-cli/issues
-[github-issues-shield]: https://img.shields.io/github/issues/lessweb/deepcode-cli?color=4d6BFE&labelColor=black&style=flat-square&cacheSeconds=1800
-[github-issues-pr-link]: https://github.com/lessweb/deepcode-cli/pulls
-[github-issues-pr-shield]: https://img.shields.io/github/issues-pr/lessweb/deepcode-cli?color=4d6BFE&labelColor=black&style=flat-square&cacheSeconds=1800
-[github-license-link]: https://github.com/lessweb/deepcode-cli/blob/main/LICENSE
-[github-license-shield]: https://img.shields.io/github/license/lessweb/deepcode-cli?color=4d6BFE&labelColor=black&style=flat-square&cacheSeconds=1800
+- Giving us a Star on GitHub (https://github.com/JanBanasik/deepcode-cli)
+- Submitting feedback and suggestions
+- Sharing with your friends and colleagues

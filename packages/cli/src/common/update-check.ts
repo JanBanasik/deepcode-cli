@@ -21,7 +21,7 @@ type UpdateState = {
 const UPDATE_STATE_FILE = "update-check.json";
 const NPM_VIEW_TIMEOUT_MS = 5000;
 const MAX_NPM_VIEW_OUTPUT_CHARS = 64 * 1024;
-export const UPDATE_SUCCESS_MESSAGE = "🎉 Update ran successfully! Please restart Deep Code.";
+export const UPDATE_SUCCESS_MESSAGE = "🎉 Update ran successfully! Please restart JCode.";
 
 export async function promptForPendingUpdate(packageInfo: PackageJson): Promise<{ installed: boolean }> {
   const state = readUpdateState();

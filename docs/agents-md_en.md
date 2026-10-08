@@ -1,6 +1,6 @@
 # AGENTS.md
 
-`AGENTS.md` is a project instruction file for AI coding assistants. Use it to record long-lived repository rules so Deep Code knows how to install dependencies, run tests, edit code, prepare changes, and follow team conventions.
+`AGENTS.md` is a project instruction file for AI coding assistants. Use it to record long-lived repository rules so JCode knows how to install dependencies, run tests, edit code, prepare changes, and follow team conventions.
 
 If you often repeat instructions such as "run this test first", "do not edit that directory", or "include these details in the PR summary", put them in `AGENTS.md`.
 
@@ -31,13 +31,13 @@ Run this inside a project:
 /init
 ```
 
-Deep Code helps create or update `AGENTS.md`. You can also create it manually:
+JCode helps create or update `AGENTS.md`. You can also create it manually:
 
 ```bash
 touch AGENTS.md
 ```
 
-If you want Deep Code-specific project instructions, you can use:
+If you want JCode-specific project instructions, you can use:
 
 ```bash
 mkdir -p .deepcode
@@ -49,7 +49,7 @@ Common choices:
 | File | Best for |
 | ---- | -------- |
 | `AGENTS.md` | Rules that should be visible to multiple AI coding tools |
-| `.deepcode/AGENTS.md` | Rules intended only for Deep Code |
+| `.deepcode/AGENTS.md` | Rules intended only for JCode |
 | `~/.deepcode/AGENTS.md` | Personal defaults for repositories without project instructions |
 
 ## Recommended Structure

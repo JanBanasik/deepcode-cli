@@ -44,6 +44,40 @@ test("Sharp loader reuses a CLI installation without notifying or installing", a
   assert.equal(installCount, 0);
 });
 
+test("Sharp loader discovers JCode and legacy CLI executables on PATH", async () => {
+  const storageRoot = createTempDir("jcode-sharp-loader-path-");
+  const binRoot = path.join(storageRoot, "bin");
+  fs.mkdirSync(binRoot);
+  const executablePaths = ["jcode", "deepcode"].map((name) =>
+    path.join(binRoot, process.platform === "win32" ? `${name}.cmd` : name)
+  );
+  for (const executablePath of executablePaths) {
+    fs.writeFileSync(executablePath, "CLI path fixture\n");
+  }
+  const originalPath = process.env.PATH;
+  process.env.PATH = binRoot;
+  try {
+    for (const executablePath of executablePaths) {
+      const loader = createSharpLoader(
+        {
+          workspaceRoot: storageRoot,
+          storageRoot,
+          sharpVersion: SHARP_VERSION,
+          notifyInstalling: async () => assert.fail("An existing CLI should supply Sharp"),
+        },
+        {
+          loadSharpFromAnchor: (anchor) => (anchor === executablePath ? sharp : null),
+          installSharp: async () => assert.fail("An existing CLI should avoid installation"),
+        }
+      );
+      assert.equal(await loader(), sharp);
+    }
+  } finally {
+    if (originalPath === undefined) delete process.env.PATH;
+    else process.env.PATH = originalPath;
+  }
+});
+
 test("Sharp loader installs once for concurrent first calls and reuses the cache", async () => {
   const storageRoot = createTempDir("deepcode-sharp-loader-cache-");
   let installed = false;

@@ -58,7 +58,7 @@ export class DeepCodeViewProvider implements vscode.WebviewViewProvider {
           await vscode.window.withProgress(
             {
               location: vscode.ProgressLocation.Notification,
-              title: "Deep Code: Installing ReadImage dependencies",
+              title: "JCode: Installing ReadImage dependencies",
             },
             async (progress) => {
               let reportedPercent = 0;

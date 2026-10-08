@@ -1,6 +1,6 @@
-# Deep Code Permission Mechanism
+# JCode Permission Mechanism
 
-Deep Code includes a fine-grained permission control mechanism. Before the AI assistant executes a tool call (such as running a shell command, reading/writing files, accessing the network, etc.), the system determines whether to auto-allow, auto-deny, or prompt for interactive confirmation based on your configured policy.
+JCode includes a fine-grained permission control mechanism. Before the AI assistant executes a tool call (such as running a shell command, reading/writing files, accessing the network, etc.), the system determines whether to auto-allow, auto-deny, or prompt for interactive confirmation based on your configured policy.
 
 ## Overview
 
@@ -12,22 +12,22 @@ Each time the AI assistant invokes a tool, the system automatically analyzes the
 
 ## Permission Scopes
 
-Deep Code defines the following 12 permission scopes, covering various risk scenarios for tool calls:
+JCode defines the following 12 permission scopes, covering various risk scenarios for tool calls:
 
-| Permission Scope | Description                                                      |
-| ---------------- | ---------------------------------------------------------------- |
-| `read-in-cwd`    | Read files inside the current workspace                          |
-| `read-in-tmp`    | Read files inside `/tmp` or `/private/tmp`                       |
-| `read-out-cwd`   | Read files outside the current workspace                         |
-| `write-in-cwd`   | Create or overwrite files inside the current workspace           |
-| `write-in-tmp`   | Create or overwrite files inside `/tmp` or `/private/tmp`        |
-| `write-out-cwd`  | Create or overwrite files outside the current workspace          |
-| `delete-in-cwd`  | Delete files inside the current workspace                        |
-| `delete-out-cwd` | Delete files outside the current workspace                       |
-| `query-git-log`  | Query Git history (e.g., `git log`, `git show`, `git blame`)     |
+| Permission Scope | Description |
+| ---------------- | ----------- |
+| `read-in-cwd` | Read files inside the current workspace |
+| `read-in-tmp` | Read files inside `/tmp` or `/private/tmp` |
+| `read-out-cwd` | Read files outside the current workspace |
+| `write-in-cwd` | Create or overwrite files inside the current workspace |
+| `write-in-tmp` | Create or overwrite files inside `/tmp` or `/private/tmp` |
+| `write-out-cwd` | Create or overwrite files outside the current workspace |
+| `delete-in-cwd` | Delete files inside the current workspace |
+| `delete-out-cwd` | Delete files outside the current workspace |
+| `query-git-log` | Query Git history (e.g., `git log`, `git show`, `git blame`) |
 | `mutate-git-log` | Mutate Git history (e.g., `git commit`, `git rebase`, `git tag`) |
-| `network`        | Access the network (e.g., `curl`, `npm install`)                 |
-| `mcp`            | Invoke MCP external tools                                        |
+| `network` | Access the network (e.g., `curl`, `npm install`) |
+| `mcp` | Invoke MCP external tools |
 
 There is also a special `unknown` scope used when the LLM cannot classify a command's side effects — **`unknown` always triggers a prompt**.
 
@@ -49,13 +49,13 @@ Configure permissions in `~/.deepcode/settings.json` (user-level) or `.deepcode/
 
 ### Configuration Fields
 
-| Field            | Type                       | Description                                                                                         |
-| ---------------- | -------------------------- | --------------------------------------------------------------------------------------------------- |
-| `allow`          | `string[]`                 | Permission scopes that are always auto-allowed                                                      |
-| `deny`           | `string[]`                 | Permission scopes that are always auto-denied                                                       |
-| `ask`            | `string[]`                 | Permission scopes that always trigger a confirmation prompt                                         |
-| `defaultMode`    | `"allowAll"` \| `"askAll"` | Default behavior for scopes not explicitly listed in `allow`/`deny`/`ask`. Defaults to `"allowAll"` |
-| `addWorkingDirs` | `string[]`                 | Additional directories treated as part of the current workspace                                     |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `allow` | `string[]` | Permission scopes that are always auto-allowed |
+| `deny` | `string[]` | Permission scopes that are always auto-denied |
+| `ask` | `string[]` | Permission scopes that always trigger a confirmation prompt |
+| `defaultMode` | `"allowAll"` \| `"askAll"` | Default behavior for scopes not explicitly listed in `allow`/`deny`/`ask`. Defaults to `"allowAll"` |
+| `addWorkingDirs` | `string[]` | Additional directories treated as part of the current workspace |
 
 User-level and project-level `addWorkingDirs` values are merged and deduplicated. Absolute paths are used directly, while relative paths are resolved against the current project root; directories do not need to exist yet. The workspace scope takes precedence when a path is both a working directory and a system temporary directory.
 
@@ -94,7 +94,6 @@ Default behavior: all operations are auto-allowed with no confirmation required.
 ```
 
 With this configuration:
-
 - Reading/writing inside the workspace and querying Git history → auto-allowed
 - All other operations → require user confirmation
 

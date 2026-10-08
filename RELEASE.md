@@ -1,6 +1,8 @@
 # 版本发布
 
-Deep Code 使用三个脚本管理 monorepo 的版本发布流程：
+JCode is currently an unpublished personal fork. Use the [local build/install instructions](README-en.md#local-installation). The release procedures below describe inherited upstream tooling and package identifiers; no JCode npm or Marketplace release channel is configured.
+
+JCode 使用三个脚本管理 monorepo 的版本发布流程：
 
 | 脚本                         | 命令                      | 用途                                                                 |
 | ---------------------------- | ------------------------- | -------------------------------------------------------------------- |

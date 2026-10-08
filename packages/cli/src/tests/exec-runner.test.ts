@@ -375,7 +375,7 @@ test("runExecMode catches prompt execution errors and disposes resources", async
   );
 
   assert.equal(code, 1);
-  assert.match(harness.stderr.join("\n"), /deepcode: request exploded/);
+  assert.match(harness.stderr.join("\n"), /jcode: request exploded/);
   assert.equal(harness.disposed, 1);
 });
 

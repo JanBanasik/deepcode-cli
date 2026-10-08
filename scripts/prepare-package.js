@@ -224,7 +224,7 @@ const TOTAL_STEPS = 8;
 // ── Banner ───────────────────────────────────────────────────────────────────
 
 log("=========================================");
-log(`  Deep Code CLI — Publish v${version}`);
+log(`  JCode — Publish v${version}`);
 log(`  tag=${tag}  dryRun=${dryRun}  force=${force}`);
 log("=========================================");
 
@@ -384,7 +384,7 @@ const distPackageJson = {
   type: "module",
   main: "cli.js",
   bin: {
-    deepcode: "cli.js",
+    jcode: "cli.js",
   },
   files: ["cli.js", "chunks/**", "templates/**", "bundled/**", "README.md", "LICENSE"],
   engines: cliPkg.engines,

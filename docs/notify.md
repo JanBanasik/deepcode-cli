@@ -1,10 +1,10 @@
-# Deep Code 任务完成通知
+# JCode 任务完成通知
 
-当 AI 助手完成一轮任务后，Deep Code 可以自动执行一个通知脚本，将任务结果发送到你指定的渠道（如 Slack、系统通知等）。
+当 AI 助手完成一轮任务后，JCode 可以自动执行一个通知脚本，将任务结果发送到你指定的渠道（如 Slack、系统通知等）。
 
 ## 工作原理
 
-在 `settings.json` 中配置 `notify` 字段，指向一个可执行脚本的完整路径。每次 AI 助手完成任务应答后，Deep Code 会执行该脚本，并通过环境变量注入上下文信息。
+在 `settings.json` 中配置 `notify` 字段，指向一个可执行脚本的完整路径。每次 AI 助手完成任务应答后，JCode 会执行该脚本，并通过环境变量注入上下文信息。
 
 ## 注入的环境变量
 
@@ -68,7 +68,7 @@ BRANCH=$(git branch --show-current 2>/dev/null)
 curl -X POST "$SLACK_WEBHOOK_URL" \
   -H "Content-type: application/json" \
   --data "{
-      \"text\": \"✅ Deep Code 任务已完成\n · cwd: $CURRENT_DIR\n · Branch: $BRANCH\n · Duration: $DURATION 秒\"
+      \"text\": \"✅ JCode 任务已完成\n · cwd: $CURRENT_DIR\n · Branch: $BRANCH\n · Duration: $DURATION 秒\"
   }"
 ```
 

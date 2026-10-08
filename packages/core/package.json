@@ -1,14 +1,14 @@
 {
   "name": "@vegamo/deepcode-core",
   "version": "0.4.3",
-  "description": "Deep Code core library — LLM session management, tool execution, and shared utilities",
+  "description": "JCode core library — LLM session management, tool execution, and shared utilities",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lessweb/deepcode-cli.git"
+    "url": "git+https://github.com/JanBanasik/deepcode-cli.git"
   },
   "exports": {
     ".": {

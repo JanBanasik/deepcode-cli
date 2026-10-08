@@ -488,7 +488,7 @@ test("SessionManager marks skills loaded from existing session messages", async 
   assert.equal(loadedSkill?.isLoaded, true);
 });
 
-test("SessionManager lists skills from Deep Code and .agents roots by priority", async () => {
+test("SessionManager lists skills from JCode and .agents roots by priority", async () => {
   const workspace = createTempDir("deepcode-project-skills-workspace-");
   const home = createTempDir("deepcode-project-skills-home-");
   setHomeDir(home);
@@ -1407,7 +1407,7 @@ test("createSession stores /init and sends the active .deepcode project AGENTS p
   globalThis.fetch = (async () => ({ ok: true, text: async () => "" }) as Response) as typeof fetch;
 
   fs.mkdirSync(path.join(workspace, ".deepcode"), { recursive: true });
-  fs.writeFileSync(path.join(workspace, ".deepcode", "AGENTS.md"), "deepcode project instructions", "utf8");
+  fs.writeFileSync(path.join(workspace, ".deepcode", "AGENTS.md"), "jcode project instructions", "utf8");
   fs.writeFileSync(path.join(workspace, "AGENTS.md"), "root project instructions", "utf8");
 
   const manager = createSessionManager(workspace, "machine-id-init-deepcode");
@@ -1428,7 +1428,7 @@ test("createSession stores /init and sends the active .deepcode project AGENTS p
   assert.equal(userMessage?.content, "/init");
   assert.match(openAIUserMessage?.content ?? "", /Update \.\/\.deepcode\/AGENTS\.md/);
   assert.doesNotMatch(openAIUserMessage?.content ?? "", /Update \.\/AGENTS\.md/);
-  assert.ok(systemContents.includes("deepcode project instructions"));
+  assert.ok(systemContents.includes("jcode project instructions"));
   assert.ok(!systemContents.includes("root project instructions"));
 });
 

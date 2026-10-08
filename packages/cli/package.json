@@ -1,14 +1,14 @@
 {
   "name": "@vegamo/deepcode-cli",
   "version": "0.4.3",
-  "description": "JCode — personal Deep Code fork for DeepSeek in your terminal",
+  "description": "JCode — a terminal coding assistant for DeepSeek",
   "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lessweb/deepcode-cli.git"
+    "url": "git+https://github.com/JanBanasik/deepcode-cli.git"
   },
-  "homepage": "https://deepcode.vegamo.cn",
+  "homepage": "https://github.com/JanBanasik/deepcode-cli",
   "bin": {
     "jcode": "./dist/cli.js"
   },

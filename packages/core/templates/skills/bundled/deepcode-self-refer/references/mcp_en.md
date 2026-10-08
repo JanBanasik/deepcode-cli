@@ -1,10 +1,10 @@
-# Deep Code CLI MCP Configuration Guide
+# JCode MCP Configuration Guide
 
-Deep Code CLI supports MCP (Model Context Protocol), enabling AI assistants to connect with external tools and services such as GitHub, browsers, databases, and more.
+JCode supports MCP (Model Context Protocol), enabling AI assistants to connect with external tools and services such as GitHub, browsers, databases, and more.
 
 ## Overview
 
-Once MCP is configured, Deep Code can:
+Once MCP is configured, JCode can:
 
 - Operate on GitHub repositories (view issues, create PRs, search code, etc.)
 - Control browsers (screenshots, clicks, form filling, etc.)
@@ -12,7 +12,7 @@ Once MCP is configured, Deep Code can:
 - Connect to databases and APIs
 - ...and any external service compatible with the MCP protocol
 
-MCP tools are named in Deep Code using the format `mcp__<service_name>__<tool_name>`, for example `mcp__github__search_code`.
+MCP tools are named in JCode using the format `mcp__<service_name>__<tool_name>`, for example `mcp__github__search_code`.
 
 ## Configuring MCP Servers
 
@@ -41,17 +41,17 @@ Edit `~/.deepcode/settings.json` and add the `mcpServers` field:
 
 ### Configuration Fields
 
-| Field     | Type     | Required | Description                                                                                                                                                      |
-| --------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `command` | string   | Yes      | Path or command of the MCP server executable (e.g., `npx`, `node`, `python`). When the command is `npx`, Deep Code automatically prepends `-y` to the arguments. |
-| `args`    | string[] | No       | List of arguments to pass to the command                                                                                                                         |
-| `env`     | object   | No       | Environment variables (e.g., API keys) to pass to the MCP server process                                                                                         |
+| Field     | Type     | Required | Description                                                                                                                                                        |
+| --------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `command` | string   | Yes      | Path or command of the MCP server executable (e.g., `npx`, `node`, `python`). When the command is `npx`, JCode automatically prepends `-y` to the arguments. |
+| `args`    | string[] | No       | List of arguments to pass to the command                                                                                                                           |
+| `env`     | object   | No       | Environment variables (e.g., API keys) to pass to the MCP server process                                                                                           |
 
 ## Common MCP Examples
 
 ### GitHub MCP
 
-Allows Deep Code to directly operate on GitHub repositories (search code, manage issues/PRs, read/write files, etc.):
+Allows JCode to directly operate on GitHub repositories (search code, manage issues/PRs, read/write files, etc.):
 
 ```json
 {
@@ -71,7 +71,7 @@ Allows Deep Code to directly operate on GitHub repositories (search code, manage
 
 ### Browser Control (Playwright)
 
-Lets Deep Code control a browser for screenshots, page interactions, etc.:
+Lets JCode control a browser for screenshots, page interactions, etc.:
 
 ```json
 {
@@ -86,7 +86,7 @@ Lets Deep Code control a browser for screenshots, page interactions, etc.:
 
 ### File System
 
-Enables Deep Code to read and write files within a specified directory:
+Enables JCode to read and write files within a specified directory:
 
 ```json
 {
@@ -146,12 +146,12 @@ Below is a complete `~/.deepcode/settings.json` with both GitHub and Playwright 
 
 ## Using MCP
 
-After configuration, start `deepcode` and type `/mcp` in the chat to view the status of all configured MCP servers and the list of tools each server provides.
+After configuration, start `jcode` and type `/mcp` in the chat to view the status of all configured MCP servers and the list of tools each server provides.
 
 Simply use the MCP tool name in your conversation to invoke it, for example:
 
 ```
-Help me search for issues in the deepcode-cli repository on GitHub
+Help me search for issues in the JCode fork (JanBanasik/deepcode-cli) on GitHub
 ```
 
 The AI will automatically invoke the `mcp__github__search_issues` tool to complete the action.
@@ -160,12 +160,12 @@ The AI will automatically invoke the `mcp__github__search_issues` tool to comple
 
 An MCP tool name consists of three parts: `mcp__<service_name>__<tool_name>`
 
-| Service    | Tool Name               | Full Invocation Name                       |
-| ---------- | ----------------------- | ------------------------------------------ |
-| github     | search_code             | `mcp__github__search_code`                 |
-| github     | create_pull_request     | `mcp__github__create_pull_request`         |
-| playwright | browser_navigate        | `mcp__playwright__browser_navigate`        |
-| playwright | browser_take_screenshot | `mcp__playwright__browser_take_screenshot` |
+| Service    | Tool Name               | Full Invocation Name                        |
+| ---------- | ----------------------- | ------------------------------------------- |
+| github     | search_code             | `mcp__github__search_code`                  |
+| github     | create_pull_request     | `mcp__github__create_pull_request`          |
+| playwright | browser_navigate        | `mcp__playwright__browser_navigate`         |
+| playwright | browser_take_screenshot | `mcp__playwright__browser_take_screenshot`  |
 
 You can view the list of tools provided by each server using `/mcp`.
 
@@ -177,17 +177,17 @@ If an MCP server fails to start, check:
 
 1. Whether `command` is installed (e.g., `npx` requires Node.js)
 2. Whether environment variables in `env` are correct (e.g., `GITHUB_PERSONAL_ACCESS_TOKEN`)
-3. Whether the terminal running `deepcode` has network access
+3. Whether the terminal running `jcode` has network access
 
 ### Tools Not Showing Up
 
 1. Verify that the `mcpServers` field in `settings.json` is correctly formatted
-2. After starting deepcode, use `/mcp` to check server status
+2. After starting jcode, use `/mcp` to check server status
 3. If the server status shows an error, debug based on the error message
 
 ### Windows Users
 
-On Windows, Deep Code CLI automatically adds shell support for `.cmd` commands. If your MCP command is a batch script, ensure the filename ends with `.cmd`.
+On Windows, JCode automatically adds shell support for `.cmd` commands. If your MCP command is a batch script, ensure the filename ends with `.cmd`.
 
 ## Writing Your Own MCP Server
 
