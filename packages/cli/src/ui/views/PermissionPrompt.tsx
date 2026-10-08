@@ -1,3 +1,4 @@
+import { theme } from "../theme";
 import React, { useEffect, useMemo, useState } from "react";
 import { Box, Text } from "ink";
 import { useTerminalInput } from "../hooks";
@@ -128,39 +129,39 @@ export function PermissionPrompt({ requests, onSubmit, onCancel }: Props): React
   }
 
   return (
-    <Box flexDirection="column" borderStyle="round" borderColor="yellow" paddingX={1} marginY={1}>
+    <Box flexDirection="column" borderStyle="round" borderColor={theme.warning} paddingX={1} marginY={1}>
       <Box marginBottom={1}>
-        <Text color="yellow" bold>
+        <Text color={theme.warning} bold>
           Permission required
         </Text>
-        <Text dimColor>
+        <Text color={theme.muted}>
           {" "}
           {Math.min(effectiveIndex + 1, prompts.length)}/{prompts.length}
         </Text>
       </Box>
       <Text bold>{prompt.request.name}</Text>
       <Text>{prompt.request.command}</Text>
-      {prompt.request.description ? <Text color="cyanBright">{prompt.request.description}</Text> : null}
+      {prompt.request.description ? <Text color={theme.selection}>{prompt.request.description}</Text> : null}
       <Box marginTop={1}>
         <Text>Do you want to proceed?</Text>
       </Box>
       <Box flexDirection="column" marginTop={1}>
         {options.map((option, optionIndex) => (
-          <Text key={option.kind} color={optionIndex === cursor ? "cyanBright" : undefined}>
+          <Text key={option.kind} color={optionIndex === cursor ? theme.selection : undefined}>
             {optionIndex === cursor ? "> " : "  "}
             {optionIndex + 1}. {renderOptionLabel(option)}
           </Text>
         ))}
       </Box>
       <Box marginTop={1}>
-        <Text dimColor>↑/↓ move · Enter select · Esc interrupt</Text>
+        <Text color={theme.muted}>↑/↓ move · Enter select · Esc interrupt</Text>
       </Box>
     </Box>
   );
 }
 
 function renderOptionLabel(option: PromptOption): React.ReactNode {
-  if (option.scopeDescription && option.scopeColor) {
+  if (option.scopeDescription) {
     return (
       <>
         {option.label}
@@ -228,26 +229,26 @@ function isAlwaysAllowedScope(scope: AskPermissionScope): scope is PermissionSco
   return ALWAYS_ALLOWED_SCOPES.has(scope);
 }
 
-export function getScopeRiskColor(scope: AskPermissionScope): string {
+export function getScopeRiskColor(scope: AskPermissionScope): string | undefined {
   switch (scope) {
     case "read-in-cwd":
     case "read-in-tmp":
     case "write-in-tmp":
     case "query-git-log":
-      return "#22c55e";
+      return theme.success;
     case "read-out-cwd":
     case "write-in-cwd":
     case "network":
     case "mcp":
-      return "#f59e0b";
+      return theme.warning;
     case "write-out-cwd":
     case "delete-in-cwd":
     case "delete-out-cwd":
     case "mutate-git-log":
     case "unknown":
-      return "#ef4444";
+      return theme.error;
     default:
-      return "#ef4444";
+      return theme.error;
   }
 }
 

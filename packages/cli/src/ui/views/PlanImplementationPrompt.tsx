@@ -1,3 +1,4 @@
+import { theme } from "../theme";
 import React, { useEffect, useState } from "react";
 import { Box, Text } from "ink";
 import { useTerminalInput } from "../hooks";
@@ -78,21 +79,21 @@ export function PlanImplementationPrompt({ onSelect }: Props): React.ReactElemen
   });
 
   return (
-    <Box flexDirection="column" borderStyle="round" borderColor="yellow" paddingX={1} marginY={1}>
-      <Text color="yellow" bold>
+    <Box flexDirection="column" borderStyle="round" borderColor={theme.warning} paddingX={1} marginY={1}>
+      <Text color={theme.warning} bold>
         Plan ready
       </Text>
-      <Text dimColor>Choose what to do next:</Text>
+      <Text color={theme.muted}>Choose what to do next:</Text>
       <Box flexDirection="column" marginTop={1}>
         {CHOICES.map((choice, index) => (
-          <Text key={choice.value} color={index === cursor ? "cyanBright" : undefined}>
+          <Text key={choice.value} color={index === cursor ? theme.selection : undefined}>
             {index === cursor ? "> " : "  "}
             {index + 1}. {choice.label}
           </Text>
         ))}
       </Box>
       <Box marginTop={1}>
-        <Text dimColor>1-4 select · ↑/↓ move · Enter select</Text>
+        <Text color={theme.muted}>1-4 select · ↑/↓ move · Enter select</Text>
       </Box>
     </Box>
   );

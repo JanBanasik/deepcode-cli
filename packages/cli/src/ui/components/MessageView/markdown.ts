@@ -1,4 +1,4 @@
-import chalk from "chalk";
+import { chalk, themeText } from "../../theme";
 
 /**
  * A rendered piece of markdown.  Consumers should use `wrap="truncate-end"` for
@@ -36,7 +36,7 @@ export function renderMarkdownSegments(text: string, maxWidth?: number): Markdow
   for (const seg of fenceSegments) {
     if (seg.kind === "code") {
       const langTag = seg.lang ? chalk.dim(`[${seg.lang}]`) + "\n" : "";
-      segments.push({ kind: "code", body: langTag + chalk.cyan(seg.body), lang: seg.lang });
+      segments.push({ kind: "code", body: langTag + themeText.secondary(seg.body), lang: seg.lang });
       continue;
     }
     const blocks = splitTableBlocks(seg.body);
@@ -369,20 +369,20 @@ function renderInlineLine(line: string): string {
   const headingMatch = /^(\s*)(#{1,6})\s+(.*)$/.exec(line);
   if (headingMatch) {
     const [, lead, hashes, content] = headingMatch;
-    const styled = hashes.length <= 2 ? chalk.bold.cyanBright(content) : chalk.bold.cyan(content);
+    const styled = hashes.length <= 2 ? themeText.primary.bold(content) : themeText.secondary.bold(content);
     return `${lead}${chalk.dim(hashes)} ${styled}`;
   }
 
   const listMatch = /^(\s*)([-*+])\s+(.*)$/.exec(line);
   if (listMatch) {
     const [, lead, bullet, content] = listMatch;
-    return `${lead}${chalk.yellow(bullet)} ${renderInlineSpans(content)}`;
+    return `${lead}${themeText.secondary(bullet)} ${renderInlineSpans(content)}`;
   }
 
   const numListMatch = /^(\s*)(\d+\.)\s+(.*)$/.exec(line);
   if (numListMatch) {
     const [, lead, marker, content] = numListMatch;
-    return `${lead}${chalk.yellow(marker)} ${renderInlineSpans(content)}`;
+    return `${lead}${themeText.secondary(marker)} ${renderInlineSpans(content)}`;
   }
 
   const quoteMatch = /^(\s*)>\s?(.*)$/.exec(line);
@@ -406,7 +406,7 @@ function renderInlineSpans(text: string): string {
     if (match.index > lastIndex) {
       parts.push(renderEmphasisSpans(text.slice(lastIndex, match.index)));
     }
-    parts.push(chalk.cyan(match[1] ?? ""));
+    parts.push(themeText.secondary(match[1] ?? ""));
     lastIndex = match.index + match[0].length;
   }
 

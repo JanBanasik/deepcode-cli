@@ -1,21 +1,22 @@
+import { theme } from "../ui/theme";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { getScopeRiskColor } from "../ui/views/PermissionPrompt";
 
 test("getScopeRiskColor maps permission scopes by risk", () => {
-  assert.equal(getScopeRiskColor("read-in-cwd"), "#22c55e");
-  assert.equal(getScopeRiskColor("read-in-tmp"), "#22c55e");
-  assert.equal(getScopeRiskColor("write-in-tmp"), "#22c55e");
-  assert.equal(getScopeRiskColor("query-git-log"), "#22c55e");
+  assert.equal(getScopeRiskColor("read-in-cwd"), theme.success);
+  assert.equal(getScopeRiskColor("read-in-tmp"), theme.success);
+  assert.equal(getScopeRiskColor("write-in-tmp"), theme.success);
+  assert.equal(getScopeRiskColor("query-git-log"), theme.success);
 
-  assert.equal(getScopeRiskColor("read-out-cwd"), "#f59e0b");
-  assert.equal(getScopeRiskColor("write-in-cwd"), "#f59e0b");
-  assert.equal(getScopeRiskColor("network"), "#f59e0b");
-  assert.equal(getScopeRiskColor("mcp"), "#f59e0b");
+  assert.equal(getScopeRiskColor("read-out-cwd"), theme.warning);
+  assert.equal(getScopeRiskColor("write-in-cwd"), theme.warning);
+  assert.equal(getScopeRiskColor("network"), theme.warning);
+  assert.equal(getScopeRiskColor("mcp"), theme.warning);
 
-  assert.equal(getScopeRiskColor("write-out-cwd"), "#ef4444");
-  assert.equal(getScopeRiskColor("delete-in-cwd"), "#ef4444");
-  assert.equal(getScopeRiskColor("delete-out-cwd"), "#ef4444");
-  assert.equal(getScopeRiskColor("mutate-git-log"), "#ef4444");
-  assert.equal(getScopeRiskColor("unknown"), "#ef4444");
+  assert.equal(getScopeRiskColor("write-out-cwd"), theme.error);
+  assert.equal(getScopeRiskColor("delete-in-cwd"), theme.error);
+  assert.equal(getScopeRiskColor("delete-out-cwd"), theme.error);
+  assert.equal(getScopeRiskColor("mutate-git-log"), theme.error);
+  assert.equal(getScopeRiskColor("unknown"), theme.error);
 });

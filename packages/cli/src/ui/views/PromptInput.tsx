@@ -1,7 +1,7 @@
+import { chalk, theme, themeText, terminalColor } from "../theme";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Text, useStdout } from "ink";
 import type { DOMElement } from "ink";
-import chalk from "chalk";
 import { stripVTControlCharacters } from "node:util";
 import { ARGS_SEPARATOR } from "../constants";
 import {
@@ -117,7 +117,7 @@ const MAX_QUEUED_PROMPT_PREVIEWS = 3;
 const PromptPrefixLine = React.memo(function PromptPrefixLine(): React.ReactElement {
   return (
     <Box width={PROMPT_PREFIX_WIDTH}>
-      <Text color="#229ac3">{"> "}</Text>
+      <Text color={theme.primary}>{"> "}</Text>
     </Box>
   );
 });
@@ -791,22 +791,22 @@ export const PromptInput = React.memo(function PromptInput({
     <Box flexDirection="column" width={screenWidth}>
       {imageUrls.length > 0 ? (
         <Box>
-          <Text color="magenta">{formatImageAttachmentStatus(imageUrls.length)}</Text>
-          <Text dimColor>{` (${IMAGE_ATTACHMENT_CLEAR_HINT})`}</Text>
+          <Text color={theme.primary}>{formatImageAttachmentStatus(imageUrls.length)}</Text>
+          <Text color={theme.muted}>{` (${IMAGE_ATTACHMENT_CLEAR_HINT})`}</Text>
         </Box>
       ) : null}
       {selectedSkills.length > 0 ? (
         <Box>
-          <Text color="magenta" wrap="truncate-end">
+          <Text color={theme.primary} wrap="truncate-end">
             {formatSelectedSkillsStatus(selectedSkills)}
           </Text>
-          <Text dimColor> (use /skills to edit)</Text>
+          <Text color={theme.muted}> (use /skills to edit)</Text>
         </Box>
       ) : null}
       {planMode ? (
         <Box width={screenWidth} justifyContent="flex-end">
-          <Text color="yellow">💡 Plan mode</Text>
-          <Text dimColor> (shift+tab to cycle)</Text>
+          <Text color={theme.warning}>💡 Plan mode</Text>
+          <Text color={theme.muted}> (shift+tab to cycle)</Text>
         </Box>
       ) : null}
       {/* Input */}
@@ -817,7 +817,7 @@ export const PromptInput = React.memo(function PromptInput({
         borderBottom={true}
         borderLeft={false}
         borderRight={false}
-        borderDimColor
+        borderColor={theme.border}
       >
         <PromptPrefixLine />
         <Box ref={inputTextRef} flexGrow={1} flexShrink={1} width={inputContentWidth}>
@@ -830,19 +830,19 @@ export const PromptInput = React.memo(function PromptInput({
               !terminalCursorActive
             )}
           </Text>
-          {inlineHint ? <Text dimColor>{inlineHint}</Text> : null}
+          {inlineHint ? <Text color={theme.muted}>{inlineHint}</Text> : null}
         </Box>
       </Box>
       {queuedPrompts.length > 0 ? (
         <Box flexDirection="column" width={screenWidth}>
-          <Text color="cyan">{formatQueuedPromptStatus(queuedPrompts.length)}</Text>
+          <Text color={theme.secondary}>{formatQueuedPromptStatus(queuedPrompts.length)}</Text>
           {queuedPromptPreviews.map((preview, index) => (
             <Text key={index} dimColor wrap="truncate-end">
               {`${index + 1}. ${preview}`}
             </Text>
           ))}
           {remainingQueuedPromptCount > 0 ? (
-            <Text dimColor>{`… ${remainingQueuedPromptCount} more queued`}</Text>
+            <Text color={theme.muted}>{`… ${remainingQueuedPromptCount} more queued`}</Text>
           ) : null}
         </Box>
       ) : null}
@@ -883,7 +883,7 @@ export const PromptInput = React.memo(function PromptInput({
       <SlashCommandMenu width={screenWidth} items={slashMenu} activeIndex={menuIndex} />
       {!showFooterText && (
         <Box>
-          <Text dimColor wrap="truncate-end">
+          <Text color={theme.muted} wrap="truncate-end">
             {footerText}
           </Text>
         </Box>
@@ -904,11 +904,11 @@ export const PromptInput = React.memo(function PromptInput({
               lines.push(currentLine);
             }
             return lines.map((line, lineIndex) => (
-              <Box key={lineIndex}>
+              <Box key={lineIndex} width={screenWidth}>
                 {line.map((segment, index) => (
                   <React.Fragment key={segment.id}>
-                    {index > 0 && <Text dimColor>{statusLineSeparator ?? " · "}</Text>}
-                    <Text color={segment.color} dimColor={!segment.color}>
+                    {index > 0 && <Text color={theme.muted}>{statusLineSeparator ?? " · "}</Text>}
+                    <Text color={terminalColor(segment.color)} dimColor={!segment.color} wrap="truncate-end">
                       {segment.text}
                     </Text>
                   </React.Fragment>
@@ -1056,7 +1056,7 @@ function highlightPasteMarkersInText(s: string, validIds: Map<number, string>): 
   while ((match = PASTE_MARKER_REGEX.exec(s)) !== null) {
     result += s.slice(pos, match.index);
     const id = Number.parseInt(match[1]!, 10);
-    result += validIds.has(id) ? chalk.yellow(match[0]) : match[0];
+    result += validIds.has(id) ? themeText.secondary(match[0]) : match[0];
     pos = match.index + match[0].length;
   }
   result += s.slice(pos);
@@ -1114,12 +1114,12 @@ function renderTextSegmentWithCursor(
 
   // Cursor not in this segment – just return the text.
   if (cursorRel < 0 || cursorRel > segText.length) {
-    return highlighted ? chalk.yellow(segText) : segText;
+    return highlighted ? themeText.secondary(segText) : segText;
   }
 
   // Cursor is exactly at `end` (which equals `segText.length`).
   if (cursorRel === segText.length) {
-    return highlighted ? chalk.yellow(segText) + renderCursorCell(" ") : segText + renderCursorCell(" ");
+    return highlighted ? themeText.secondary(segText) + renderCursorCell(" ") : segText + renderCursorCell(" ");
   }
 
   // Cursor is somewhere inside the segment.
@@ -1135,7 +1135,7 @@ function renderTextSegmentWithCursor(
   const before = segText.slice(0, cursorRel);
   const after = segText.slice(cursorRel + 1);
   if (highlighted) {
-    return chalk.yellow(before) + renderCursorCell(at) + chalk.yellow(after);
+    return themeText.secondary(before) + renderCursorCell(at) + themeText.secondary(after);
   }
   return before + renderCursorCell(at) + after;
 }

@@ -1,3 +1,4 @@
+import { theme } from "../theme";
 import React, { useEffect, useMemo, useState } from "react";
 import { Box, Text } from "ink";
 import type { AskUserQuestionAnswers, AskUserQuestionItem } from "../core/ask-user-question";
@@ -190,12 +191,12 @@ export function AskUserQuestionPrompt({ questions, onSubmit, onCancel }: Props):
   }
 
   return (
-    <Box flexDirection="column" borderStyle="round" borderColor="yellow" paddingX={1} marginY={1}>
+    <Box flexDirection="column" borderStyle="round" borderColor={theme.warning} paddingX={1} marginY={1}>
       <Box marginBottom={1}>
-        <Text color="yellow" bold>
+        <Text color={theme.warning} bold>
           Answer questions
         </Text>
-        <Text dimColor>
+        <Text color={theme.muted}>
           {" "}
           {questionIndex + 1}/{questions.length}
         </Text>
@@ -210,7 +211,7 @@ export function AskUserQuestionPrompt({ questions, onSubmit, onCancel }: Props):
           const marker = question.multiSelect ? (isSelected ? "[x]" : "[ ]") : isSelected ? "●" : "○";
           return (
             <Box key={option.value} flexDirection="column">
-              <Text color={isCursor ? "cyanBright" : undefined}>
+              <Text color={isCursor ? theme.selection : undefined}>
                 {isCursor ? "> " : "  "}
                 {marker} <Text bold={isCursor}>{option.label}</Text>
               </Text>
@@ -219,20 +220,20 @@ export function AskUserQuestionPrompt({ questions, onSubmit, onCancel }: Props):
                   marginLeft={4}
                   marginTop={0}
                   borderStyle="single"
-                  borderColor={isCursor ? "cyanBright" : "gray"}
+                  borderColor={isCursor ? theme.selection : theme.muted}
                   paddingX={1}
                   width={64}
                 >
                   {otherText ? (
-                    <Text color="white">{renderBufferWithCursor(otherState, isCursor)}</Text>
+                    <Text color={theme.text}>{renderBufferWithCursor(otherState, isCursor)}</Text>
                   ) : (
-                    <Text dimColor>{isCursor ? "type your answer here" : "type a custom answer"}</Text>
+                    <Text color={theme.muted}>{isCursor ? "type your answer here" : "type a custom answer"}</Text>
                   )}
                 </Box>
               ) : null}
               {option.description ? (
                 <Box marginLeft={3}>
-                  <Text dimColor> {option.description}</Text>
+                  <Text color={theme.muted}> {option.description}</Text>
                 </Box>
               ) : null}
             </Box>
@@ -240,7 +241,7 @@ export function AskUserQuestionPrompt({ questions, onSubmit, onCancel }: Props):
         })}
       </Box>
       <Box marginTop={1}>
-        <Text dimColor>
+        <Text color={theme.muted}>
           {statusMessage ??
             (isCurrentOther
               ? "Type your answer · ←/→ move · Alt+←/→ word · Home/End · Enter submit/next · ↑ choose presets · Esc cancel"

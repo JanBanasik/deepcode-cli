@@ -1,3 +1,4 @@
+import { theme } from "../theme";
 import React, { useState } from "react";
 import { Box, Text, useApp, useInput } from "ink";
 
@@ -67,7 +68,7 @@ export function UpdatePrompt({ currentVersion, latestVersion, installCommand, on
         {options.map((option, index) => {
           const selected = index === selectedIndex;
           return (
-            <Text key={option.value} color={selected ? "green" : undefined}>
+            <Text key={option.value} color={selected ? theme.success : undefined}>
               {selected ? "> " : "  "}
               {index + 1}. {option.label}
             </Text>
@@ -75,7 +76,7 @@ export function UpdatePrompt({ currentVersion, latestVersion, installCommand, on
         })}
       </Box>
       <Box marginTop={1}>
-        <Text dimColor>Use Up/Down to choose, Enter to confirm, Esc to ignore once.</Text>
+        <Text color={theme.muted}>Use Up/Down to choose, Enter to confirm, Esc to ignore once.</Text>
       </Box>
     </Box>
   );

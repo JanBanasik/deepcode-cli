@@ -1,3 +1,4 @@
+import { theme } from "../theme";
 import React, { useMemo, useState } from "react";
 import { Box, Text, useInput, useWindowSize } from "ink";
 import type { UndoTarget } from "@vegamo/deepcode-core";
@@ -82,8 +83,8 @@ export function UndoSelector({ targets, onSelect, onCancel }: Props): React.Reac
   if (targets.length === 0) {
     return (
       <Box flexDirection="column" marginTop={1}>
-        <Text color="yellow">Nothing to undo yet.</Text>
-        <Text dimColor>Press Esc to go back.</Text>
+        <Text color={theme.warning}>Nothing to undo yet.</Text>
+        <Text color={theme.muted}>Press Esc to go back.</Text>
       </Box>
     );
   }
@@ -97,12 +98,12 @@ export function UndoSelector({ targets, onSelect, onCancel }: Props): React.Reac
       paddingX={1}
       marginTop={1}
     >
-      <Box flexDirection="column" borderStyle="round" borderDimColor flexGrow={1} overflow="hidden">
+      <Box flexDirection="column" borderStyle="round" borderColor={theme.border} flexGrow={1} overflow="hidden">
         <Box paddingX={1}>
-          <Text bold color="#229ac3">
+          <Text bold color={theme.primary}>
             Undo
           </Text>
-          <Text dimColor> restore to the point before a prompt</Text>
+          <Text color={theme.muted}> restore to the point before a prompt</Text>
         </Box>
         {phase === "message" ? (
           <Box
@@ -111,7 +112,7 @@ export function UndoSelector({ targets, onSelect, onCancel }: Props): React.Reac
             borderLeft={false}
             borderRight={false}
             borderStyle="round"
-            borderDimColor
+            borderColor={theme.border}
             flexDirection="column"
             flexGrow={1}
             paddingX={1}
@@ -122,12 +123,12 @@ export function UndoSelector({ targets, onSelect, onCancel }: Props): React.Reac
               const isActive = actualIndex === safeTargetIndex;
               return (
                 <Box key={target.message.id} height={2} marginBottom={1}>
-                  <Text color="#229ac3">{isActive ? "> " : "  "}</Text>
+                  <Text color={theme.primary}>{isActive ? "> " : "  "}</Text>
                   <Box flexDirection="column" flexGrow={1}>
-                    <Text color={isActive ? "#229ac3" : undefined} bold={isActive}>
+                    <Text color={isActive ? theme.primary : undefined} bold={isActive}>
                       {formatUndoMessage(target.message.content)}
                     </Text>
-                    <Text dimColor>
+                    <Text color={theme.muted}>
                       {formatTimestamp(target.message.createTime)}
                       {target.canRestoreCode ? " · code checkpoint available" : " · conversation only"}
                     </Text>
@@ -143,33 +144,33 @@ export function UndoSelector({ targets, onSelect, onCancel }: Props): React.Reac
             borderLeft={false}
             borderRight={false}
             borderStyle="round"
-            borderDimColor
+            borderColor={theme.border}
             flexDirection="column"
             flexGrow={1}
             paddingX={1}
             overflow="hidden"
           >
-            <Text dimColor>Selected prompt:</Text>
+            <Text color={theme.muted}>Selected prompt:</Text>
             <Text>{formatUndoMessage(selectedTarget?.message.content ?? "")}</Text>
             <Box marginTop={1} flexDirection="column">
-              <Text color={modeIndex === 0 ? "cyanBright" : undefined}>
+              <Text color={modeIndex === 0 ? theme.selection : undefined}>
                 {modeIndex === 0 ? "> " : "  "}Restore code and conversation
               </Text>
-              <Text dimColor>
+              <Text color={theme.muted}>
                 {"  "}
                 {selectedTarget?.canRestoreCode
                   ? "Restore files from the recorded Git checkpoint, then fork the conversation."
                   : "No code checkpoint is recorded for this prompt."}
               </Text>
-              <Text color={modeIndex === 1 ? "cyanBright" : undefined}>
+              <Text color={modeIndex === 1 ? theme.selection : undefined}>
                 {modeIndex === 1 ? "> " : "  "}Restore conversation
               </Text>
-              <Text dimColor>{"  "}Fork the conversation without changing files.</Text>
+              <Text color={theme.muted}>{"  "}Fork the conversation without changing files.</Text>
             </Box>
           </Box>
         )}
         <Box>
-          <Text dimColor>
+          <Text color={theme.muted}>
             {phase === "message"
               ? "↑/↓ navigate · Enter choose · Esc cancel"
               : "↑/↓ choose restore mode · Enter restore · Esc back"}

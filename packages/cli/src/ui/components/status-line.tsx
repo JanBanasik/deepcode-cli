@@ -1,3 +1,4 @@
+import { theme } from "../theme";
 import React, { useEffect, useState } from "react";
 import { Box, Text } from "ink";
 
@@ -30,12 +31,12 @@ export const StatusLine = React.memo(function StatusLine({
     <Box width={width} height={1} overflow="hidden">
       {busy ? (
         <Box marginRight={1} flexShrink={0}>
-          <Text color="yellow">{STATUS_SPINNER_FRAMES[spinnerIndex]}</Text>
+          <Text color={theme.warning}>{STATUS_SPINNER_FRAMES[spinnerIndex]}</Text>
         </Box>
       ) : null}
       {text ? (
         <Box flexGrow={1} flexShrink={1} minWidth={0}>
-          <Text dimColor wrap="truncate-end">
+          <Text color={theme.muted} wrap="truncate-end">
             {text}
           </Text>
         </Box>
