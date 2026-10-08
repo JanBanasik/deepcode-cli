@@ -1,6 +1,6 @@
+import { theme, themeText } from "../theme";
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Box, Static, Text, useApp, useStdout, useWindowSize } from "ink";
-import chalk from "chalk";
 import { createOpenAIClientFactory } from "@vegamo/deepcode-core";
 import type { PermissionScope } from "@vegamo/deepcode-core";
 import { type ModelConfigSelection } from "@vegamo/deepcode-core";
@@ -35,7 +35,6 @@ import { renderMessageToStdout } from "../components/MessageView/utils";
 import {
   buildPromptDraftFromSessionMessage,
   buildPromptHistory,
-  buildStatusLine,
   buildSyntheticUserMessage,
   formatModelConfig,
   isCurrentSessionEmpty,
@@ -59,6 +58,10 @@ import type {
 } from "@vegamo/deepcode-core";
 import { SessionManager } from "@vegamo/deepcode-core";
 import { writeStdout, writeStdoutLine } from "../../utils/stdio-helpers";
+import { readSettings, readProjectSettings } from "@vegamo/deepcode-core";
+import { useGitBranch } from "../hooks/useGitBranch";
+import { SessionStatus as CompactSessionStatus } from "../components/session-status";
+import { getStatusContextLimit, formatSessionActivity } from "../statusline/session-status";
 
 type View = "chat" | "session-list" | "undo" | "mcp-status";
 
@@ -134,7 +137,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
         }
       },
       onSessionEntryUpdated: (entry) => {
-        setStatusLine(buildStatusLine(entry, resolveCurrentSettings(projectRoot)));
+        setStatusLine(formatSessionActivity(entry));
         setRunningProcesses(entry.processes);
         setActiveStatus(entry.status);
         setActiveAskPermissions(entry.askPermissions);
@@ -295,7 +298,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
 
         writeStdoutLine("\n");
         if (showCommand) {
-          writeStdoutLine(chalk.rgb(34, 154, 195)(" > /exit "));
+          writeStdoutLine(themeText.primary(" > /exit "));
           writeStdoutLine("\n");
         }
         if (showSummary) {
@@ -349,7 +352,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
           sessionManager.setActiveSessionId(sessionId);
           await resetStaticView(loadVisibleMessages(sessionManager, sessionId), { clearScreen: true });
           const session = sessionManager.getSession(sessionId);
-          setStatusLine(session ? buildStatusLine(session, resolveCurrentSettings(projectRoot)) : "");
+          setStatusLine(session ? formatSessionActivity(session) : "");
           setRunningProcesses(null);
           setActiveStatus(session?.status ?? null);
           setActiveAskPermissions(undefined);
@@ -467,7 +470,6 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
       resetToWelcome,
       resetStaticView,
       planMode,
-      projectRoot,
     ]
   );
 
@@ -533,7 +535,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
       if (activeSessionId) {
         sessionManager.addSessionSystemMessage(activeSessionId, content, true, meta);
         const activeSession = sessionManager.getSession(activeSessionId);
-        setStatusLine(activeSession ? buildStatusLine(activeSession, next) : "");
+        setStatusLine(activeSession ? formatSessionActivity(activeSession) : "");
       } else {
         const now = new Date().toISOString();
         setMessages((prev) => [
@@ -612,7 +614,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
       // Clear first so <Static> resets its index to 0.
       await resetStaticView(loadVisibleMessages(sessionManager, sessionId), { clearScreen: true });
       const session = sessionManager.getSession(sessionId);
-      setStatusLine(session ? buildStatusLine(session, resolveCurrentSettings(projectRoot)) : "");
+      setStatusLine(session ? formatSessionActivity(session) : "");
       setRunningProcesses(session?.processes ?? null);
       setActiveStatus(session?.status ?? null);
       setActiveAskPermissions(session?.askPermissions);
@@ -623,7 +625,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
       }
       await refreshSkills(sessionId);
     },
-    [sessionManager, resetStaticView, pendingPermissionReply, projectRoot, refreshSkills]
+    [sessionManager, resetStaticView, pendingPermissionReply, refreshSkills]
   );
 
   /**
@@ -810,6 +812,18 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
 
   const screenWidth = useMemo(() => columns ?? stdout?.columns ?? 80, [columns, stdout]);
   const screenHeight = useMemo(() => rows ?? stdout?.rows ?? 24, [rows, stdout]);
+  const gitBranch = useGitBranch(projectRoot, busy);
+  const contextLimit = useMemo(
+    () =>
+      getStatusContextLimit(resolvedSettings.model, resolvedSettings.contextWindow, [
+        process.env.DEEPCODE_CONTEXT_WINDOW,
+        readProjectSettings(projectRoot)?.contextWindow,
+        readSettings()?.contextWindow,
+      ]),
+    [projectRoot, resolvedSettings]
+  );
+  const activeSessionId = sessionManager.getActiveSessionId();
+  const statusSession = activeSessionId ? sessionManager.getSession(activeSessionId) : null;
   const getSessionInfo = useCallback((): SessionInfo | null => {
     const activeSessionId = sessionManager.getActiveSessionId();
     const settings = resolveCurrentSettings(projectRoot);
@@ -1026,7 +1040,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
       {(busy || statusLine) && !isExiting ? <StatusLine busy={busy} text={statusLine} width={screenWidth} /> : null}
       {errorLine ? (
         <Box>
-          <Text color="red">Error: {errorLine}</Text>
+          <Text color={theme.error}>Error: {errorLine}</Text>
         </Box>
       ) : null}
       {showProcessStdout ? (
@@ -1117,6 +1131,15 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
           onPlanModeChange={setPlanMode}
         />
       )}
+      {!isExiting ? (
+        <CompactSessionStatus
+          model={resolvedSettings.model}
+          contextWindow={contextLimit}
+          session={statusSession}
+          gitBranch={gitBranch}
+          width={screenWidth}
+        />
+      ) : null}
     </Box>
   );
 }
