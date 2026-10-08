@@ -137,6 +137,7 @@ function App({ projectRoot, initialPrompt, resumeSessionId, forkSessionId, onRes
         }
       },
       onSessionEntryUpdated: (entry) => {
+        setResolvedSettings(resolveCurrentSettings(projectRoot));
         setStatusLine(formatSessionActivity(entry));
         setRunningProcesses(entry.processes);
         setActiveStatus(entry.status);
